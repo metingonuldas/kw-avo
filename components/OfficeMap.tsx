@@ -5,40 +5,50 @@ import { Loader } from "@googlemaps/js-api-loader";
 
 export default function OfficeMap({ offices }: { offices: Office[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const initialized = useRef(false); // hot-reload'da tekrar initialize etmemek için
+  const initialized = useRef(false);
 
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
 
     const loader = new Loader({
-      apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY as string,
+      apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY!, // env garanti olsun
       version: "weekly",
     });
 
-    loader.load().then(() => {
-      if (!mapRef.current || !(window as any).google?.maps) return;
+    loader.load().then((google) => {
+      if (!mapRef.current) return;
 
       const center = offices[0]?.location ?? { lat: 38.45, lng: 27.2 };
-      const map = new (window as any).google.maps.Map(mapRef.current, {
+
+      const map = new google.maps.Map(mapRef.current, {
         center,
         zoom: 10,
         mapId: "KWAVO_MAP",
       });
 
       offices.forEach((o) => {
-        const marker = new (window as any).google.maps.Marker({
+        const marker = new google.maps.Marker({
           position: o.location,
           map,
           title: o.name,
         });
-        const infowindow = new (window as any).google.maps.InfoWindow({
+
+        const infowindow = new google.maps.InfoWindow({
           content: `<div style="font-size:14px"><b>${o.name}</b><br/>${o.address}</div>`,
         });
-        marker.addListener("click", () => infowindow.open({ anchor: marker, map }));
+
+        marker.addListener("click", () => {
+          infowindow.open({ anchor: marker, map });
+        });
       });
     });
   }, [offices]);
 
-  return <div ref={mapRef} className="w-full h-[420px] rounded-2xl border border-gray-200" />;
+  return (
+    <div
+      ref={mapRef}
+      className="w-full h-[420px] rounded-2xl border border-gray-200"
+    />
+  );
 }
