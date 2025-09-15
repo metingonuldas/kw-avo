@@ -6,22 +6,21 @@ import OfficeSelect from "@/components/forms/OfficeSelect";
 type Opt = { value: string; label: string };
 
 export default function ContactForm({
-  prefillOffice,
   options,
+  prefillOffice,
 }: {
-  prefillOffice?: string;
   options: Opt[];
+  prefillOffice?: string;
 }) {
-  // form state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [office, setOffice] = useState(
-    options.find((o) => o.value === prefillOffice)?.value ?? ""
+    options.find((o) => o.value === (prefillOffice ?? ""))?.value ?? ""
   );
   const [message, setMessage] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [ok, setOk] = useState<null | boolean>(null);
+  const [ok, setOk] = useState<boolean | null>(null);
   const [errorText, setErrorText] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -38,23 +37,23 @@ export default function ContactForm({
           name,
           email,
           message,
-          office,
+          office,        // ← seçilen ofis
           replyTo: email,
         }),
       });
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || (data as any)?.ok === false) {
-        throw new Error((data as any)?.error || "Mesaj gönderilemedi.");
+      if (!res.ok || (data as { ok?: boolean }).ok === false) {
+        throw new Error((data as { error?: string }).error || "Mesaj gönderilemedi.");
       }
 
       setOk(true);
       setName("");
       setEmail("");
       setMessage("");
-    } catch (err: unknown) {                    // ← değişti
-      const msg =
-        err instanceof Error ? err.message : "Beklenmeyen bir hata oluştu.";
+      // setOffice("") // ofis seçimi kalacaksa bunu yorumda bırak
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Beklenmeyen bir hata oluştu.";
       setOk(false);
       setErrorText(msg);
     } finally {
@@ -66,7 +65,6 @@ export default function ContactForm({
     <main className="mx-auto max-w-2xl px-4 sm:px-6 py-12">
       <h1 className="text-2xl font-semibold mb-6">İletişim</h1>
 
-      {/* durum panelleri */}
       {ok === true && (
         <div className="mb-4 rounded-xl bg-green-50 text-green-900 text-sm px-4 py-3 ring-1 ring-green-200">
           Mesajın alındı. En kısa sürede dönüş yapacağız. ✅
@@ -102,11 +100,12 @@ export default function ContactForm({
           />
         </div>
 
+        {/* Şık dropdown */}
         <div>
           <label className="block text-sm font-medium mb-1">Ofis</label>
           <OfficeSelect
-            name="office"
-            options={options}
+            name="office"                  // ← ZORUNLU
+            options={options}              // ← ZORUNLU
             value={office}
             onChange={setOffice}
             placeholder="Ofis seçin veya arayın…"
@@ -124,14 +123,8 @@ export default function ContactForm({
           />
         </div>
 
-        {/* basit honeypot (botlar için) */}
-        <input
-          type="text"
-          name="company"
-          className="hidden"
-          tabIndex={-1}
-          autoComplete="off"
-        />
+        {/* basit honeypot */}
+        <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
         <button
           type="submit"

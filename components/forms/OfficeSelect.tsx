@@ -20,9 +20,6 @@ export default function OfficeSelect({
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [activeIndex, setActiveIndex] = useState<number>(-1);
-
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const listRef = useRef<HTMLUListElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const selected = options.find((o) => o.value === value) ?? null;
@@ -36,6 +33,7 @@ export default function OfficeSelect({
     );
   }, [options, q]);
 
+  // dışarı tıklayınca kapat
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -48,6 +46,7 @@ export default function OfficeSelect({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
+  // klavye
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (!open && (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
@@ -80,10 +79,10 @@ export default function OfficeSelect({
 
   return (
     <div ref={containerRef} className="relative" onKeyDown={onKeyDown}>
+      {/* hidden input: form fallback */}
       <input type="hidden" name={name} value={value ?? ""} />
 
       <button
-        ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full rounded-xl border border-black/10 px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black/10"
@@ -113,7 +112,7 @@ export default function OfficeSelect({
             />
           </div>
 
-          <ul ref={listRef} role="listbox" className="max-h-56 overflow-auto py-1">
+          <ul role="listbox" className="max-h-56 overflow-auto py-1">
             {filtered.length === 0 && (
               <li className="px-3 py-2 text-sm text-gray-500">Sonuç yok</li>
             )}
@@ -132,9 +131,7 @@ export default function OfficeSelect({
                       setOpen(false);
                       setQ("");
                     }}
-                    className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between ${
-                      active ? "bg-gray-50" : ""
-                    }`}
+                    className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between ${active ? "bg-gray-50" : ""}`}
                   >
                     <span>{o.label}</span>
                     {selectedItem && (
