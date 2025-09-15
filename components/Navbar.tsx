@@ -21,26 +21,12 @@ const corporateMenu = [
   { href: "/media", label: "Media Kit" },
 ];
 
-/* Hover gecikme hook (desktop dropdown için) */
-function useHoverDelay(delayIn = 80, delayOut = 160) {
+/* Hover gecikme hook (click-only mod için sadeleştirildi) */
+function useHoverDelay() {
   const [open, setOpen] = useState(false);
-  const timer = useRef<number | null>(null);
-
-  const clear = () => {
-    if (timer.current !== null) {
-      window.clearTimeout(timer.current);
-      timer.current = null;
-    }
-  };
-  const onEnter = () => {
-    clear();
-    timer.current = window.setTimeout(() => setOpen(true), delayIn);
-  };
-  const onLeave = () => {
-    clear();
-    timer.current = window.setTimeout(() => setOpen(false), delayOut);
-  };
-  useEffect(() => () => clear(), []);
+  // hover davranışını tamamen kapatıyoruz:
+  const onEnter = () => {};
+  const onLeave = () => {};
   return { open, setOpen, onEnter, onLeave };
 }
 
@@ -111,7 +97,7 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
-          {/* Kurumsal (desktop dropdown) */}
+          {/* Kurumsal (desktop dropdown) – sadece tıklama ile aç/kapat */}
           <li
             className="relative"
             ref={corpMenuRef}

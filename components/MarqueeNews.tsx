@@ -23,7 +23,7 @@ export default async function MarqueeNews() {
                 className="inline-flex items-center gap-2 hover:text-red-600"
               >
                 <span className="inline-block rounded-full bg-red-600/10 text-red-700 px-2 py-0.5 text-[11px]">
-                  Latest
+                  Haberler
                 </span>
                 <span className="truncate">{p.title}</span>
                 <span className="opacity-40">{"//"}</span>
