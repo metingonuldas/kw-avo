@@ -1,25 +1,14 @@
 // app/media/page.tsx
 import Link from "next/link";
+import Image from "next/image"; // ← EKLE
 
 const base = "/media";
 
 const logos = [
-  {
-    title: "KW Alesta Logo (SVG)",
-    file: `${base}/logos/kw-alesta.svg`,
-  },
-  {
-    title: "KW Viya Logo (SVG)",
-    file: `${base}/logos/kw-viya.svg`,
-  },
-  {
-    title: "KW Orsa Logo (SVG)",
-    file: `${base}/logos/kw-orsa.svg`,
-  },
-  {
-    title: "KW Alesta • Viya • Orsa Ortak Logo (SVG)",
-    file: `${base}/logos/kw-alestaviyaorsa.svg`,
-  },
+  { title: "KW Alesta Logo (SVG)", file: `${base}/logos/kw-alesta.svg` },
+  { title: "KW Viya Logo (SVG)", file: `${base}/logos/kw-viya.svg` },
+  { title: "KW Orsa Logo (SVG)", file: `${base}/logos/kw-orsa.svg` },
+  { title: "KW Alesta • Viya • Orsa Ortak Logo (SVG)", file: `${base}/logos/kw-alestaviyaorsa.svg` },
 ];
 
 export const dynamic = "force-static";
@@ -50,15 +39,16 @@ export default function MediaPage() {
 
         <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {logos.map((l) => (
-            <div
-              key={l.file}
-              className="rounded-2xl border border-black/10 overflow-hidden"
-            >
+            <div key={l.file} className="rounded-2xl border border-black/10 overflow-hidden">
               <div className="relative aspect-[3/2] bg-white grid place-items-center p-6">
-                <img
+                {/* width/height vererek optimize Image kullan */}
+                <Image
                   src={l.file}
                   alt={l.title}
-                  className="max-h-full max-w-full p-6"
+                  width={1200}
+                  height={800}
+                  className="max-h-full max-w-full p-6 h-auto w-auto"
+                  priority={false}
                 />
               </div>
 
@@ -82,9 +72,7 @@ export default function MediaPage() {
         <h2 className="text-lg font-medium">Marka Kullanım</h2>
         <div className="mt-3 space-y-3 text-sm text-gray-700">
           <p>
-            Logolar yalnızca orantılı biçimde ölçeklenmeli; renkler değiştirilmemeli,
-            eğilmemeli veya efekt eklenmemelidir. Yeterli boşluk bırakın ve arka plan
-            kontrastını koruyun.
+            Logolar yalnızca orantılı biçimde ölçeklenmeli; renkler değiştirilmemeli, eğilmemeli veya efekt eklenmemelidir. Yeterli boşluk bırakın ve arka plan kontrastını koruyun.
           </p>
           <ul className="list-disc pl-5">
             <li>Minimum logo genişliği: 120px (ekran), 25mm (baskı)</li>
@@ -109,8 +97,7 @@ export default function MediaPage() {
           </div>
 
           <p className="text-xs text-gray-500 pt-2">
-            Keller Williams® markası ve logoları Keller Williams Realty, Inc.’in
-            tescilli markalarıdır. Yerel franchise ofisleri bağımsız olarak işletilir.
+            Keller Williams® markası ve logoları Keller Williams Realty, Inc.’in tescilli markalarıdır. Yerel franchise ofisleri bağımsız olarak işletilir.
           </p>
         </div>
       </section>

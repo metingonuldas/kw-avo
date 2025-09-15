@@ -38,24 +38,25 @@ export default function ContactForm({
           name,
           email,
           message,
-          office,            // backend’de istersen kullan
-          replyTo: email,    // Resend için
+          office,
+          replyTo: email,
         }),
       });
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.ok === false) {
-        throw new Error(data?.error || "Mesaj gönderilemedi.");
+      if (!res.ok || (data as any)?.ok === false) {
+        throw new Error((data as any)?.error || "Mesaj gönderilemedi.");
       }
 
       setOk(true);
       setName("");
       setEmail("");
       setMessage("");
-      // office seçimi dursun istiyorsan setOffice(office) yapma
-    } catch (err: any) {
+    } catch (err: unknown) {                    // ← değişti
+      const msg =
+        err instanceof Error ? err.message : "Beklenmeyen bir hata oluştu.";
       setOk(false);
-      setErrorText(err?.message || "Beklenmeyen bir hata oluştu.");
+      setErrorText(msg);
     } finally {
       setLoading(false);
     }

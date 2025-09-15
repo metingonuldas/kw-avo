@@ -1,4 +1,5 @@
 export const dynamic = "force-static";
+import Link from "next/link";
 
 export default function TechnologyPage() {
   return (
@@ -54,12 +55,12 @@ export default function TechnologyPage() {
       <section className="mt-12">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Eğitim Takvimi</h2>
-          <a
+          <Link
             href="/press"
             className="text-sm underline underline-offset-4 hover:opacity-80"
           >
             Duyurular
-          </a>
+          </Link>
         </div>
 
         {/* Google Calendar embed kullanacaksanız src'yi değiştirin */}
