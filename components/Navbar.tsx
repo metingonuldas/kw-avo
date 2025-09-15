@@ -1,10 +1,11 @@
-// components/Navbar.tsx
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 
+/* Üstte duran linkler */
 const primaryLinks = [
   { href: "/", label: "Ana Sayfa" },
   { href: "/about", label: "Hakkımızda" },
@@ -12,155 +13,275 @@ const primaryLinks = [
   { href: "/contact", label: "İletişim" },
 ];
 
-// Kurumsal alt menüsü
+/* Kurumsal alt menü */
 const corporateMenu = [
   { href: "/leadership", label: "Liderlik" },
   { href: "/press", label: "Basın" },
   { href: "/technology", label: "Teknoloji" },
-  { href: "/media", label: "Media Kit" }, // 👈 buradan erişilecek
-  // { href: "/kvkk", label: "KVKK" }, // ileride eklersin
+  { href: "/media", label: "Media Kit" },
 ];
 
+/* Hover gecikme hook (desktop dropdown için) */
+function useHoverDelay(delayIn = 80, delayOut = 160) {
+  const [open, setOpen] = useState(false);
+  const timer = useRef<number | null>(null);
+
+  const clear = () => {
+    if (timer.current !== null) {
+      window.clearTimeout(timer.current);
+      timer.current = null;
+    }
+  };
+  const onEnter = () => {
+    clear();
+    timer.current = window.setTimeout(() => setOpen(true), delayIn);
+  };
+  const onLeave = () => {
+    clear();
+    timer.current = window.setTimeout(() => setOpen(false), delayOut);
+  };
+  useEffect(() => () => clear(), []);
+  return { open, setOpen, onEnter, onLeave };
+}
+
+/* Dropdown animasyonları (desktop) */
+const dropdownVariants: Variants = {
+  hidden: { opacity: 0, y: -6, scale: 0.98 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 380, damping: 30, mass: 0.6 },
+  },
+  exit: { opacity: 0, y: -6, scale: 0.98, transition: { duration: 0.12 } },
+};
+
 export default function Navbar() {
-  const pathname = usePathname();
+  /* Mobil menü state’leri */
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [corpOpen, setCorpOpen] = useState(false); // desktop klavye erişimi için
+  const [mobileCorpOpen, setMobileCorpOpen] = useState(false); // accordion
+
+  /* Desktop Kurumsal dropdown */
+  const corp = useHoverDelay();
   const corpMenuRef = useRef<HTMLLIElement>(null);
 
-  // Menü dışında tıklayınca Kurumsal menüyü kapat
   useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (!corpMenuRef.current) return;
-      if (!corpMenuRef.current.contains(e.target as Node)) setCorpOpen(false);
+    function onDocClick(e: MouseEvent) {
+      if (corpMenuRef.current && !corpMenuRef.current.contains(e.target as Node)) {
+        corp.setOpen(false);
+      }
     }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [corp]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        corp.setOpen(false);
+        setMobileOpen(false);
+        setMobileCorpOpen(false);
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [corp]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/5 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <nav className="mx-auto max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between">
-        <Link href="/" className="font-semibold tracking-tight">
-          KW Alesta • Viya • Orsa
+    <header className="sticky top-0 z-50 border-b border-black/5 bg-white/80 backdrop-blur">
+      <nav className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/media/logos/kw-alestaviyaorsa.svg" // PNG kullanacaksan /images/kw-hero-c.png + unoptimized
+            alt="KWAVO"
+            width={260}
+            height={80}
+            className="h-16 w-auto"
+            priority
+          />
         </Link>
 
-        {/* Desktop menu */}
-        <ul className="hidden md:flex items-center gap-5 text-sm">
+        {/* Masaüstü menü */}
+        <ul className="hidden md:flex items-center gap-6 text-sm">
           {primaryLinks.map((l) => (
             <li key={l.href}>
-              <Link
-                href={l.href}
-                className={`hover:opacity-80 ${
-                  pathname === l.href ? "font-medium underline underline-offset-8" : ""
-                }`}
-              >
+              <Link href={l.href} className="hover:opacity-80">
                 {l.label}
               </Link>
             </li>
           ))}
-
-          {/* Kurumsal dropdown */}
-          <li className="relative" ref={corpMenuRef}>
+          {/* Kurumsal (desktop dropdown) */}
+          <li
+            className="relative"
+            ref={corpMenuRef}
+            onMouseEnter={corp.onEnter}
+            onMouseLeave={corp.onLeave}
+          >
             <button
-              className="hover:opacity-80"
+              className="inline-flex items-center gap-1 hover:opacity-80"
+              onClick={() => corp.setOpen((v) => !v)}
               aria-haspopup="menu"
-              aria-expanded={corpOpen}
-              onClick={() => setCorpOpen((v) => !v)}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") setCorpOpen(false);
-                if (e.key === "ArrowDown") setCorpOpen(true);
-              }}
+              aria-expanded={corp.open}
             >
               Kurumsal
+              <svg width="10" height="10" viewBox="0 0 20 20" aria-hidden>
+                <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
             </button>
 
-            <div
-              className={`absolute left-0 top-full mt-2 w-56 rounded-xl border border-black/10 bg-white shadow-lg transition
-                          ${corpOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
-              role="menu"
-            >
-              <ul className="py-2 text-sm">
-                {corporateMenu.map((m) => (
-                  <li key={m.href}>
-                    <Link
-                      href={m.href}
-                      className={`block px-3 py-2 hover:bg-gray-50 ${
-                        pathname === m.href ? "font-medium" : ""
-                      }`}
-                      role="menuitem"
-                      onClick={() => setCorpOpen(false)}
-                    >
-                      {m.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <AnimatePresence>
+              {corp.open && (
+                <motion.div
+                  key="corp-menu"
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                  variants={dropdownVariants}
+                  className="absolute left-0 top-full mt-2 w-56 rounded-xl border border-black/10 bg-white shadow-lg"
+                  role="menu"
+                >
+                  <ul className="py-2 text-sm">
+                    {corporateMenu.map((m) => (
+                      <li key={m.href}>
+                        <Link
+                          href={m.href}
+                          className="block px-3 py-2 hover:bg-gray-50"
+                          role="menuitem"
+                          onClick={() => corp.setOpen(false)}
+                        >
+                          {m.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </li>
         </ul>
 
-        {/* Sağ CTA */}
+        {/* Sağ CTA (desktop) */}
         <Link
           href="/contact"
-          className="hidden md:inline-flex items-center rounded-xl px-3 py-2 text-sm font-medium bg-black text-white hover:opacity-90"
+          className="hidden md:inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium bg-black text-white hover:opacity-90"
         >
           Danışman Ol
         </Link>
 
-        {/* Mobile hamburger */}
+        {/* Mobil hamburger (ikon) */}
         <button
-          className="md:hidden inline-flex items-center rounded-lg px-3 py-2 ring-1 ring-black/10"
-          onClick={() => setMobileOpen((s) => !s)}
+          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 ring-1 ring-black/10"
+          onClick={() => {
+            const next = !mobileOpen;
+            setMobileOpen(next);
+            if (!next) setMobileCorpOpen(false); // menü kapanınca accordion da kapansın
+          }}
           aria-expanded={mobileOpen}
           aria-controls="mobile-menu"
-          aria-label="Menüyü aç/kapat"
+          aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
         >
-          Menü
+          {mobileOpen ? (
+            /* X icon */
+            <svg width="22" height="22" viewBox="0 0 24 24">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          ) : (
+            /* Hamburger icon */
+            <svg width="22" height="22" viewBox="0 0 24 24">
+              <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          )}
         </button>
       </nav>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div id="mobile-menu" className="md:hidden border-t border-black/5 bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-3 space-y-1 text-sm">
-            {primaryLinks.map((l) => (
+      {/* Mobil menü (accordion’lı) */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            id="mobile-menu"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="md:hidden border-t border-black/5 bg-white overflow-hidden"
+          >
+            <div className="mx-auto max-w-6xl px-4 py-3 text-sm">
+              {/* Düz linkler */}
+              <div className="space-y-1">
+                {primaryLinks.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    className="block rounded-lg px-3 py-2 hover:bg-gray-50"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Kurumsal: accordion başlık */}
+              <button
+                className="mt-2 flex w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-50"
+                onClick={() => setMobileCorpOpen((v) => !v)}
+                aria-expanded={mobileCorpOpen}
+                aria-controls="mobile-corporate"
+              >
+                <span>Kurumsal</span>
+                <motion.svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 20 20"
+                  animate={{ rotate: mobileCorpOpen ? 180 : 0 }}
+                  transition={{ duration: 0.16 }}
+                >
+                  <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="2" fill="none" />
+                </motion.svg>
+              </button>
+
+              {/* Kurumsal: accordion içerik */}
+              <AnimatePresence initial={false}>
+                {mobileCorpOpen && (
+                  <motion.div
+                    id="mobile-corporate"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-3 pr-3">
+                      {corporateMenu.map((m) => (
+                        <Link
+                          key={m.href}
+                          href={m.href}
+                          className="block rounded-lg px-3 py-2 hover:bg-gray-50"
+                          onClick={() => {
+                            setMobileOpen(false);
+                            setMobileCorpOpen(false);
+                          }}
+                        >
+                          {m.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* CTA */}
               <Link
-                key={l.href}
-                href={l.href}
-                className={`block rounded-lg px-3 py-2 hover:bg-gray-50 ${
-                  pathname === l.href ? "font-medium" : ""
-                }`}
+                href="/contact"
+                className="mt-3 block rounded-lg px-3 py-2 bg-black text-white text-center font-medium hover:opacity-90"
                 onClick={() => setMobileOpen(false)}
               >
-                {l.label}
+                Danışman Ol
               </Link>
-            ))}
-
-            {/* Kurumsal başlığı */}
-            <div className="mt-2 px-3 py-2 text-xs uppercase text-gray-500">Kurumsal</div>
-            {corporateMenu.map((m) => (
-              <Link
-                key={m.href}
-                href={m.href}
-                className={`block rounded-lg px-3 py-2 hover:bg-gray-50 ${
-                  pathname === m.href ? "font-medium" : ""
-                }`}
-                onClick={() => setMobileOpen(false)}
-              >
-                {m.label}
-              </Link>
-            ))}
-
-            <Link
-              href="/contact"
-              className="block rounded-lg px-3 py-2 bg-black text-white text-center font-medium hover:opacity-90 mt-2"
-              onClick={() => setMobileOpen(false)}
-            >
-              Danışman Ol
-            </Link>
-          </div>
-        </div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
