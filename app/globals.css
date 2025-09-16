@@ -34,6 +34,24 @@ body {
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
 .kw-marquee-track {
-  animation: kw-marquee 30s linear infinite;
+  animation: kw-marquee 10s linear infinite;
   will-change: transform;
+}
+
+/* Cihaz koyu modda olsa bile siteyi açık temaya zorla */
+:root,
+html.force-light {
+  color-scheme: only light;
+}
+@media (prefers-color-scheme: dark) {
+  :root,
+  html.force-light {
+    color-scheme: only light;
+  }
+}
+
+/* Güvenli zemin – global arka plan ve metin rengi */
+html.force-light body {
+  background: #fff;
+  color: #000;
 }
