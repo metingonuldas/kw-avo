@@ -1,26 +1,32 @@
-// app/mdx-components.tsx
+import Link from "next/link";
 import type { MDXComponents } from "mdx/types";
-import Image from "next/image";
+import type {
+  AnchorHTMLAttributes,
+  DetailedHTMLProps,
+} from "react";
 
-export function useMDXComponents(components: MDXComponents): MDXComponents {
+type AnchorProps = DetailedHTMLProps<
+  AnchorHTMLAttributes<HTMLAnchorElement>,
+  HTMLAnchorElement
+>;
+
+/**
+ * MDX içinde <a> etiketlerini işler:
+ *  - Dahili linkler ("/" ile başlayanlar) -> <Link>
+ *  - Harici linkler -> normal <a>
+ */
+export function useMDXComponents(
+  components: MDXComponents
+): MDXComponents {
   return {
-    // MDX içindeki <img> -> next/image
-    img: (props: any) => {
-      const { src = "", alt = "", width = 800, height = 600, ...rest } = props;
-      return (
-        <span className="block relative my-4">
-          <Image
-            src={src}
-            alt={alt}
-            width={Number(width)}
-            height={Number(height)}
-            loading="lazy"
-            decoding="async"
-            sizes="(max-width: 768px) 100vw, 800px"
-            {...rest}
-          />
-        </span>
-      );
+    a: (props: AnchorProps) => {
+      const href = props.href ?? "#";
+      if (href.startsWith("/")) {
+        const { href: _href, ...rest } = props;
+        // rest'in içinde className vb. kalsın
+        return <Link href={href} {...(rest as Omit<AnchorProps, "href">)} />;
+      }
+      return <a {...props} />;
     },
     ...components,
   };
