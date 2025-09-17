@@ -11,16 +11,9 @@ export default function ContactPage({
 }: {
   searchParams: { office?: string };
 }) {
-  const offices = getAllOffices(); // server'da çalışır (fs kullanıyor)
-  const options = offices.map((o) => ({
-    value: o.slug,
-    label: o.name, // istersen `${o.name} — ${o.address}` yap
-  }));
+  const offices = getAllOffices(); // fs ile okur (server)
+  const options = offices.map((o) => ({ value: o.slug, label: o.name }));
+  const prefillOffice = searchParams.office ?? "";
 
-  return (
-    <ContactForm
-      prefillOffice={searchParams.office ?? ""}
-      options={options}
-    />
-  );
+  return <ContactForm options={options} prefillOffice={prefillOffice} />;
 }

@@ -1,0 +1,10 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <rect x="120" y="180" width="1360" height="540" fill="#F9FAFB" stroke="#E5E7EB"/>
+  <text x="160" y="270" fill="#111827" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">
+    Denize 2.5 km — Modern Mimari
+  </text>
+  <text x="160" y="330" fill="#6B7280" font-family="Arial, Helvetica, sans-serif" font-size="26">
+    Doğa ile iç içe, şehir merkezine 10 dk
+  </text>
+</svg>

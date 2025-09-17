@@ -21,15 +21,6 @@ const corporateMenu = [
   { href: "/media", label: "Media Kit" },
 ];
 
-/* Hover gecikme hook (click-only mod için sadeleştirildi) */
-function useHoverDelay() {
-  const [open, setOpen] = useState(false);
-  // hover davranışını tamamen kapatıyoruz:
-  const onEnter = () => {};
-  const onLeave = () => {};
-  return { open, setOpen, onEnter, onLeave };
-}
-
 /* Dropdown animasyonları (desktop) */
 const dropdownVariants: Variants = {
   hidden: { opacity: 0, y: -6, scale: 0.98 },
@@ -43,35 +34,32 @@ const dropdownVariants: Variants = {
 };
 
 export default function Navbar() {
-  /* Mobil menü state’leri */
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileCorpOpen, setMobileCorpOpen] = useState(false); // accordion
-
-  /* Desktop Kurumsal dropdown */
-  const corp = useHoverDelay();
+  const [mobileCorpOpen, setMobileCorpOpen] = useState(false);
+  const [corpOpen, setCorpOpen] = useState(false);
   const corpMenuRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (corpMenuRef.current && !corpMenuRef.current.contains(e.target as Node)) {
-        corp.setOpen(false);
+        setCorpOpen(false);
       }
     }
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
-  }, [corp]);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        corp.setOpen(false);
+        setCorpOpen(false);
         setMobileOpen(false);
         setMobileCorpOpen(false);
       }
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [corp]);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/80 backdrop-blur">
@@ -79,7 +67,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
-            src="/media/logos/kw-alestaviyaorsa.svg" // PNG kullanacaksan /images/kw-hero-c.png + unoptimized
+            src="/media/logos/kw-alestaviyaorsa.svg"
             alt="KWAVO"
             width={260}
             height={80}
@@ -92,23 +80,22 @@ export default function Navbar() {
         <ul className="hidden md:flex items-center gap-6 text-sm">
           {primaryLinks.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="hover:opacity-80">
+              <Link
+                href={l.href}
+                className="px-2 py-1 rounded-md hover:bg-gray-100 transition-colors"
+              >
                 {l.label}
               </Link>
             </li>
           ))}
-          {/* Kurumsal (desktop dropdown) – sadece tıklama ile aç/kapat */}
-          <li
-            className="relative"
-            ref={corpMenuRef}
-            onMouseEnter={corp.onEnter}
-            onMouseLeave={corp.onLeave}
-          >
+
+          {/* Kurumsal */}
+          <li className="relative" ref={corpMenuRef}>
             <button
-              className="inline-flex items-center gap-1 hover:opacity-80"
-              onClick={() => corp.setOpen((v) => !v)}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors"
+              onClick={() => setCorpOpen((v) => !v)}
               aria-haspopup="menu"
-              aria-expanded={corp.open}
+              aria-expanded={corpOpen}
             >
               Kurumsal
               <svg width="10" height="10" viewBox="0 0 20 20" aria-hidden>
@@ -117,7 +104,7 @@ export default function Navbar() {
             </button>
 
             <AnimatePresence>
-              {corp.open && (
+              {corpOpen && (
                 <motion.div
                   key="corp-menu"
                   initial="hidden"
@@ -132,9 +119,9 @@ export default function Navbar() {
                       <li key={m.href}>
                         <Link
                           href={m.href}
-                          className="block px-3 py-2 hover:bg-gray-50"
+                          className="block px-3 py-2 hover:bg-gray-50 rounded-md"
                           role="menuitem"
-                          onClick={() => corp.setOpen(false)}
+                          onClick={() => setCorpOpen(false)}
                         >
                           {m.label}
                         </Link>
@@ -147,7 +134,7 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* Sağ CTA (desktop) */}
+        {/* Sağ CTA */}
         <Link
           href="/contact"
           className="hidden md:inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium bg-black text-white hover:opacity-90"
@@ -155,33 +142,41 @@ export default function Navbar() {
           Danışman Ol
         </Link>
 
-        {/* Mobil hamburger (ikon) */}
+        {/* Mobil hamburger */}
         <button
           className="md:hidden inline-flex items-center justify-center rounded-lg p-2 ring-1 ring-black/10"
           onClick={() => {
             const next = !mobileOpen;
             setMobileOpen(next);
-            if (!next) setMobileCorpOpen(false); // menü kapanınca accordion da kapansın
+            if (!next) setMobileCorpOpen(false);
           }}
           aria-expanded={mobileOpen}
           aria-controls="mobile-menu"
           aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
         >
           {mobileOpen ? (
-            /* X icon */
             <svg width="22" height="22" viewBox="0 0 24 24">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <path
+                d="M6 6l12 12M18 6L6 18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           ) : (
-            /* Hamburger icon */
             <svg width="22" height="22" viewBox="0 0 24 24">
-              <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <path
+                d="M4 6h16M4 12h16M4 18h16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           )}
         </button>
       </nav>
 
-      {/* Mobil menü (accordion’lı) */}
+      {/* Mobil menü */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -207,7 +202,7 @@ export default function Navbar() {
                 ))}
               </div>
 
-              {/* Kurumsal: accordion başlık */}
+              {/* Kurumsal accordion */}
               <button
                 className="mt-2 flex w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-50"
                 onClick={() => setMobileCorpOpen((v) => !v)}
@@ -222,11 +217,15 @@ export default function Navbar() {
                   animate={{ rotate: mobileCorpOpen ? 180 : 0 }}
                   transition={{ duration: 0.16 }}
                 >
-                  <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="2" fill="none" />
+                  <path
+                    d="M5 7l5 5 5-5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                  />
                 </motion.svg>
               </button>
 
-              {/* Kurumsal: accordion içerik */}
               <AnimatePresence initial={false}>
                 {mobileCorpOpen && (
                   <motion.div
