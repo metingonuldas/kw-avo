@@ -10,6 +10,7 @@ const primaryLinks = [
   { href: "/", label: "Ana Sayfa" },
   { href: "/about", label: "Hakkımızda" },
   { href: "/offices", label: "Ofisler" },
+  { href: "/projects",  label: "Projeler" },
   { href: "/contact", label: "İletişim" },
 ];
 
