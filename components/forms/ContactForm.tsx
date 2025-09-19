@@ -1,139 +1,200 @@
 "use client";
 
 import { useState } from "react";
-import OfficeSelect from "@/components/forms/OfficeSelect";
 
-type Opt = { value: string; label: string };
+type Subject =
+  | "Genel Bilgi"
+  | "Danışman Olmak İstiyorum"
+  | "Ofis / Randevu"
+  | "Basın / Medya"
+  | "Diğer";
 
-export default function ContactForm({
-  options,
-  prefillOffice,
-}: {
-  options: Opt[];
-  prefillOffice?: string;
-}) {
+export default function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [office, setOffice] = useState(
-    options.find((o) => o.value === (prefillOffice ?? ""))?.value ?? ""
-  );
+  const [phone, setPhone] = useState("");
+  const [subject, setSubject] = useState<Subject>("Genel Bilgi");
   const [message, setMessage] = useState("");
-
-  const [loading, setLoading] = useState(false);
-  const [ok, setOk] = useState<boolean | null>(null);
-  const [errorText, setErrorText] = useState("");
+  const [agree1, setAgree1] = useState(false);
+  const [agree2, setAgree2] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [ok, setOk] = useState<null | boolean>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     setOk(null);
-    setErrorText("");
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          message,
-          office,        // ← seçilen ofis
-          replyTo: email,
-        }),
-      });
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        subject,
+        message,
+        consent_terms: agree1,
+        consent_marketing: agree2,
+      }),
+    });
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || (data as { ok?: boolean }).ok === false) {
-        throw new Error((data as { error?: string }).error || "Mesaj gönderilemedi.");
-      }
-
-      setOk(true);
+    setSubmitting(false);
+    setOk(res.ok);
+    if (res.ok) {
       setName("");
       setEmail("");
+      setPhone("");
+      setSubject("Genel Bilgi");
       setMessage("");
-      // setOffice("") // ofis seçimi kalacaksa bunu yorumda bırak
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Beklenmeyen bir hata oluştu.";
-      setOk(false);
-      setErrorText(msg);
-    } finally {
-      setLoading(false);
+      setAgree1(false);
+      setAgree2(false);
     }
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-4 sm:px-6 py-12">
-      <h1 className="text-2xl font-semibold mb-6">İletişim</h1>
-
-      {ok === true && (
-        <div className="mb-4 rounded-xl bg-green-50 text-green-900 text-sm px-4 py-3 ring-1 ring-green-200">
-          Mesajın alındı. En kısa sürede dönüş yapacağız. ✅
-        </div>
-      )}
-      {ok === false && (
-        <div className="mb-4 rounded-xl bg-red-50 text-red-900 text-sm px-4 py-3 ring-1 ring-red-200">
-          {errorText || "Gönderim sırasında bir sorun oluştu."}
-        </div>
-      )}
-
-      <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-4">
+      {/* Ad Soyad + E-posta */}
+      <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium mb-1">Ad Soyad</label>
+          <label className="block text-sm font-medium">Ad Soyad</label>
           <input
+            className="mt-1 block w-full rounded-2xl border border-black/10 px-3 py-2 outline-none focus:ring-2 focus:ring-black/10"
             name="name"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-xl border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
+            autoComplete="name"
+            placeholder="Adınız ve soyadınız"
           />
         </div>
-
         <div>
-          <label className="block text-sm font-medium mb-1">E-posta</label>
+          <label className="block text-sm font-medium">E-posta</label>
           <input
+            className="mt-1 block w-full rounded-2xl border border-black/10 px-3 py-2 outline-none focus:ring-2 focus:ring-black/10"
             type="email"
             name="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-xl border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
+            autoComplete="email"
+            placeholder="ornek@eposta.com"
           />
         </div>
+      </div>
 
-        {/* Şık dropdown */}
+      {/* Telefon + Konu */}
+      <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium mb-1">Ofis</label>
-          <OfficeSelect
-            name="office"                  // ← ZORUNLU
-            options={options}              // ← ZORUNLU
-            value={office}
-            onChange={setOffice}
-            placeholder="Ofis seçin veya arayın…"
+          <label className="block text-sm font-medium">Telefon</label>
+          <input
+            className="mt-1 block w-full rounded-2xl border border-black/10 px-3 py-2 outline-none focus:ring-2 focus:ring-black/10"
+            name="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+90 5XX XXX XX XX"
+            autoComplete="tel"
           />
         </div>
-
         <div>
-          <label className="block text-sm font-medium mb-1">Mesaj</label>
-          <textarea
-            name="message"
-            rows={4}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="w-full rounded-xl border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
-          />
+          <label className="block text-sm font-medium">Konu</label>
+          <div className="relative">
+            <select
+              className="mt-1 block w-full appearance-none rounded-2xl border border-black/10 bg-white px-3 py-2 pr-9 outline-none focus:ring-2 focus:ring-black/10"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value as Subject)}
+            >
+              <option>Genel Bilgi</option>
+              <option>Danışman Olmak İstiyorum</option>
+              <option>Ofis / Randevu</option>
+              <option>Basın / Medya</option>
+              <option>Diğer</option>
+            </select>
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+              ▾
+            </span>
+          </div>
         </div>
+      </div>
 
-        {/* basit honeypot */}
-        <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
+      {/* Mesaj */}
+      <div>
+        <label className="block text-sm font-medium">Mesaj</label>
+        <textarea
+          className="mt-1 block w-full min-h-[120px] rounded-2xl border border-black/10 px-3 py-2 outline-none focus:ring-2 focus:ring-black/10"
+          name="message"
+          required
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Bize nasıl yardımcı olabiliriz?"
+        />
+      </div>
 
+      {/* Aydınlatma & İzinler */}
+      <div className="space-y-3 text-sm text-gray-700">
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            className="mt-1 size-4 rounded border-gray-300"
+            checked={agree1}
+            onChange={(e) => setAgree1(e.target.checked)}
+          />
+          <span>
+            Bu kutuyu işaretleyerek{" "}
+            <a
+              href="#"
+              className="underline"
+              onClick={(e) => e.preventDefault()}
+              aria-disabled
+            >
+              Kullanım Şartları
+            </a>{" "}
+            ve{" "}
+            <a
+              href="#"
+              className="underline"
+              onClick={(e) => e.preventDefault()}
+              aria-disabled
+            >
+              Gizlilik Politikası
+            </a>
+            ’nı kabul etmiş olursun.
+          </span>
+        </label>
+
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            className="mt-1 size-4 rounded border-gray-300"
+            checked={agree2}
+            onChange={(e) => setAgree2(e.target.checked)}
+          />
+          <span>
+            Bu kutuyu işaretleyerek telefon/e-posta yoluyla bilgilendirme
+            almayı kabul edersin. İstediğin zaman vazgeçebilirsin.
+          </span>
+        </label>
+      </div>
+
+      {/* Gönder */}
+      <div className="pt-2">
         <button
-          type="submit"
-          disabled={loading}
-          className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+          disabled={submitting}
+          className="inline-flex w-full items-center justify-center rounded-2xl bg-red-600 px-4 py-2.5 font-medium text-white hover:opacity-90 disabled:opacity-50 sm:w-auto"
         >
-          {loading ? "Gönderiliyor…" : "Gönder"}
+          {submitting ? "Gönderiliyor..." : "Gönder"}
         </button>
-      </form>
-    </main>
+        {ok === true && (
+          <p className="mt-2 text-sm text-green-600">
+            Teşekkürler! Mesajın alındı.
+          </p>
+        )}
+        {ok === false && (
+          <p className="mt-2 text-sm text-red-600">
+            Üzgünüz, bir sorun oluştu. Lütfen tekrar dene.
+          </p>
+        )}
+      </div>
+    </form>
   );
 }
