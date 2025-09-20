@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const stats = [
   { icon: "🏠", label: "ABD Satış Hacmi", value: "$370.8B" },
@@ -45,14 +46,16 @@ export default function StatsSection() {
           <p className="mt-4 text-[11px] text-gray-400">*Veriler değişebilir.</p>
         </div>
 
-        {/* Sağ görsel yer tutucu */}
-        <div className="relative">
-          <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-2xl aspect-[3/4] grid place-items-center">
-            <div className="text-xs text-gray-500 bg-white px-3 py-1.5 rounded-lg border">
-              Görsel Alanı 900×1200
-            </div>
-          </div>
-          <div className="absolute inset-0 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] pointer-events-none"></div>
+        {/* Sağ görsel */}
+        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+          <Image
+            src="/images/avo-stats.jpg"
+            alt="KWAVO İstatistikler"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+            priority
+          />
         </div>
       </div>
     </section>

@@ -1,17 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function AboutHero() {
   return (
     <section className="relative">
-      {/* Görsel Yer Tutucu */}
-      <div className="relative h-[52vh] min-h-[360px] bg-gray-100">
-        <div className="absolute inset-0 grid place-items-center">
-          <div className="rounded-lg border-2 border-dashed border-gray-300 bg-white px-4 py-2 text-xs text-gray-500">
-            Arkaplan Görseli – 1920×800
-          </div>
-        </div>
+      {/* Arkaplan Görseli */}
+      <div className="relative h-[52vh] min-h-[360px]">
+        <Image
+          src="/images/avo-about-hero.jpg"
+          alt="KWAVO Hakkımızda"
+          fill
+          priority
+          className="object-cover"
+        />
+        {/* Koyu overlay */}
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
