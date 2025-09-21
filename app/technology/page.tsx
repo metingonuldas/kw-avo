@@ -1,59 +1,147 @@
+// app/technology/page.tsx
+export const dynamic = "force-static";
+
+import Image from "next/image";
 import Link from "next/link";
+import TechnologyHero from "@/components/technology/TechnologyHero";
 
 export const metadata = {
   title: "Teknoloji | KW Alesta • KW Viya • KW Orsa",
   description:
-    "Tek panel teknoloji: CRM, otomasyon, lead yönetimi ve raporlama ile emlak danışmanları için geleceğin teknolojisi.",
+    "KW Command ile CRM, pazarlama, otomasyon ve raporlama tek ekranda. Masaüstü ve mobil uygulamalarla üretimi hızlandırın.",
 };
 
 export default function TechnologyPage() {
   return (
-    <main className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
-      <header className="max-w-3xl">
-        <h1 className="text-3xl font-semibold">Teknoloji</h1>
-        <p className="mt-3 text-sm text-gray-600">
-          KW danışmanları için özel geliştirilen platformlar: CRM, otomasyon, lead yakalama ve
-          raporlama. Tüm işini tek panelden yönet.
-        </p>
-      </header>
+    <main className="mx-auto max-w-6xl px-4 sm:px-6">
+      <TechnologyHero />
+      
+      {/* HERO — Laptop görseli + metin */}
+      <section className="relative mt-6 overflow-hidden rounded-2xl">
+        <div className="relative h-[46vh] min-h-[360px] w-full">
+          <Image
+            src="/images/avo-command-laptop.png"
+            alt="KW Command masaüstü uygulaması"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+        </div>
 
-      {/* Örnek içerik */}
-      <section className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          {
-            title: "CRM ve Otomasyon",
-            desc: "Müşteri bilgilerini tek panelde topla, görevleri otomatikleştir.",
-          },
-          {
-            title: "Lead Yönetimi",
-            desc: "Potansiyel müşterileri adil şekilde dağıt, dönüşüm oranını artır.",
-          },
-          {
-            title: "Raporlama",
-            desc: "Satış, pazarlama ve ekip performansını canlı takip et.",
-          },
-        ].map((c) => (
-          <div
-            key={c.title}
-            className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm"
-          >
-            <h3 className="font-medium">{c.title}</h3>
-            <p className="mt-2 text-sm text-gray-600">{c.desc}</p>
+        <div className="absolute inset-0 grid place-items-center px-4">
+          <div className="mx-auto w-full max-w-3xl text-center text-white drop-shadow
+                          opacity-100 translate-y-0 transition">
+            <h1 className="text-2xl sm:text-4xl font-semibold">
+              KW Command: Tüm İşiniz Tek Platformda
+            </h1>
+            <p className="mt-3 text-sm sm:text-base text-white/90">
+              CRM, fırsat yönetimi, akış otomasyonları, pazarlama ve raporlama — hepsi
+              aynı ekranda. Danışmanlarımızın üretimini artırmak için tasarlandı.
+            </p>
+            <div className="mt-5 flex items-center justify-center gap-3">
+              <Link
+                href="/contact"
+                className="inline-flex items-center rounded-xl bg-white px-4 py-2 text-sm font-medium text-black hover:opacity-90"
+              >
+                Bilgi Al
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-white/70 text-white hover:bg-white/10"
+              >
+                Nasıl Çalışıyoruz?
+              </Link>
+            </div>
           </div>
-        ))}
+        </div>
       </section>
 
-      <section className="mt-12">
-        <p className="text-sm text-gray-600">
-          Daha fazla bilgi için{" "}
-          <Link
-            href="/press"
-            className="underline underline-offset-4 hover:opacity-80"
-          >
-            basın sayfamızı
-          </Link>{" "}
-          ziyaret edin.
-        </p>
+      {/* GRID — Masaüstü & Mobil mockup + metinler */}
+      <section className="py-12">
+        <div className="grid gap-8 md:grid-cols-2 items-start">
+          {/* Masaüstü kartı */}
+          <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden
+                          opacity-100 translate-y-0 transition">
+            <div className="relative aspect-[16/10] bg-gray-50">
+              <Image
+                src="/images/avo-command-laptop.png"
+                alt="KW Command masaüstü ekranı"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="p-5">
+              <h2 className="text-lg font-semibold">Masaüstü Uygulaması</h2>
+              <p className="mt-2 text-sm text-gray-600">
+                CRM, pipeline, görevler ve akış otomasyonları tek panelde. Takım ve
+                lider raporlarıyla işlerinizi şeffaf ve ölçülebilir yönetin.
+              </p>
+              <ul className="mt-3 grid gap-2 text-sm text-gray-700">
+                <li>• Fırsat & teklif yönetimi</li>
+                <li>• SmartPlans ile otomasyon</li>
+                <li>• Pazarlama ve sosyal gönderiler</li>
+                <li>• Detaylı performans raporları</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Mobil kartı */}
+          <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden
+                          opacity-100 translate-y-0 transition">
+            <div className="relative aspect-[3/4] bg-gray-50">
+              <Image
+                src="/images/avo-command-mobile.png"
+                alt="KW Command mobil uygulaması"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="p-5">
+              <h2 className="text-lg font-semibold">Mobil Uygulama</h2>
+              <p className="mt-2 text-sm text-gray-600">
+                Saha odaklı, hızlı ve basit. Müşteri kayıtları, görevler, aranacaklar
+                listesi ve fırsatlar — her şey cebinizde.
+              </p>
+              <ul className="mt-3 grid gap-2 text-sm text-gray-700">
+                <li>• Lead & müşteri kartları</li>
+                <li>• Günlük görev & hatırlatmalar</li>
+                <li>• Fırsatları sahada güncelleme</li>
+                <li>• Anlık bildirim ve takip</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="mb-14">
+        <div className="rounded-2xl border border-black/10 bg-gray-50 p-6 sm:p-8 text-center">
+          <h3 className="text-lg sm:text-xl font-semibold">
+            Teknolojiyle Üretimi Artırmak İster misiniz?
+          </h3>
+          <p className="mt-2 text-sm text-gray-600">
+            KWAVO’da danışmanlarımızı hem eğitim hem teknolojiyle destekliyoruz.
+            Command ile veri temelli ve ölçeklenebilir bir iş kurun.
+          </p>
+          <div className="mt-5 flex items-center justify-center gap-3">
+            <Link
+              href="/contact"
+              className="inline-flex items-center rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              Danışman Ol
+            </Link>
+            <Link
+              href="/about"
+              className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-black/10 hover:bg-white"
+            >
+              Hakkımızda
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   );
