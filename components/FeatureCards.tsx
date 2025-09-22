@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 const cards = [
   {
@@ -8,21 +9,21 @@ const cards = [
     desc:
       "Eğitim, koçluk ve mentorluk ekosistemimizle danışmanların büyümesini hızlandırıyoruz.",
     cta: { label: "Nasıl Gelişiyoruz", href: "/technology" },
-    placeholder: { w: 640, h: 360, label: "Görsel Alanı 1280×720" },
+    image: "/images/avo-hp-c1.png",
   },
   {
     title: "Ortak Bir Misyon",
     desc:
       "1983’ten beri girişimcilere daha büyük işler kurmaları için fırsatlar sunuyoruz.",
     cta: { label: "Daha Fazla", href: "/about" },
-    placeholder: { w: 640, h: 360, label: "Görsel Alanı 1280×720" },
+    image: "/images/avo-hp-c2.png",
   },
   {
     title: "Küresel Ölçekte Büyüme",
     desc:
       "Modellerimiz ve sistemlerimiz her pazarda kârlılık çerçevesi sağlar.",
     cta: { label: "Ofislerimiz", href: "/offices" },
-    placeholder: { w: 640, h: 360, label: "Görsel Alanı 1280×720" },
+    image: "/images/avo-hp-c3.png",
   },
 ];
 
@@ -39,13 +40,15 @@ export default function FeatureCards() {
             key={c.title}
             className="group rounded-2xl border border-black/10 bg-white overflow-hidden"
           >
-            {/* Görsel Yer Tutucu */}
-            <div className="relative bg-gray-100 border-b border-black/10 aspect-[16/9] grid place-items-center">
-              <div className="text-xs text-gray-500">
-                <div className="rounded-lg border-2 border-dashed border-gray-300 px-3 py-1.5 bg-white">
-                  {c.placeholder.label}
-                </div>
-              </div>
+            {/* Görsel */}
+            <div className="relative aspect-[16/9]">
+              <Image
+                src={c.image}
+                alt={c.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover"
+              />
               {/* hover efekti */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
             </div>

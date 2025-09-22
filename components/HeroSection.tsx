@@ -5,7 +5,7 @@ export default function HeroSection() {
     <section className="relative h-[80vh] w-full">
       {/* Arka plan görseli */}
       <Image
-        src="/images/kw-hero-cover.jpg"
+        src="/images/kw-hero-cover.png"
         alt="KWAVO"
         fill
         priority
@@ -19,13 +19,23 @@ export default function HeroSection() {
       {/* İçerik */}
       <div className="relative z-10 flex h-full items-center justify-center">
         <div className="text-center text-white max-w-2xl px-4">
-          <h1 className="text-4xl sm:text-5xl font-bold">
-            Girişimcilerin Geliştiği Yer
-          </h1>
+          {/* SVG görsel */}
+          <div className="flex justify-center">
+            <Image
+              src="/images/avo-herotext.svg"
+              alt="Girişimcilerin Geliştiği Yer"
+              width={500}   // ihtiyacına göre ayarla
+              height={120}  // ihtiyacına göre ayarla
+              priority
+            />
+          </div>
+
+          {/* Altındaki yazı */}
           <p className="mt-4 text-lg text-gray-200">
             KW Alesta • KW Viya • KW Orsa ile İzmir’de gayrimenkul sektörünü
             yeniden tanımlıyoruz.
           </p>
+
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <a
               href="/about"

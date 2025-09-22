@@ -9,7 +9,7 @@ export default function AboutHero() {
       {/* Arkaplan Görseli */}
       <div className="relative h-[52vh] min-h-[360px]">
         <Image
-          src="/images/avo-about-hero.jpg"
+          src="/images/avo-redday24.png"
           alt="KWAVO Hakkımızda"
           fill
           priority
