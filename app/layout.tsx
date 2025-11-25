@@ -1,36 +1,61 @@
+// app/layout.tsx
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://kw-avo.vercel.app"),
-  title: { default: "KW Alesta • KW Viya • KW Orsa", template: "%s | KWAVO" },
-  description: "Girişimcinin geliştiği yer. Eğitim, teknoloji ve paylaşım kültürüyle İzmir’de büyüyoruz.",
+  title: {
+    default: "KW Alesta • KW Viya • KW Orsa",
+    template: "%s | KW Alesta Viya Orsa",
+  },
+  description:
+    "Girişimcinin geliştiği yer. Eğitim, teknoloji ve paylaşım kültürüyle İzmir’de büyüyoruz.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "/",
-    title: "KWAVO",
+    title: "KW Alesta • KW Viya • KW Orsa",
     description: "Girişimcinin geliştiği yer.",
-    images: [{ url: "/og/og-default.png", width: 1200, height: 630 }],
+    images: [
+      {
+        url: "/og/og-default.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   twitter: { card: "summary_large_image" },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Cookie’lerden bakım modunu oku
+  const cookieStore = await cookies();
+  const isMaintenance = cookieStore.get("mw_maint")?.value === "1";
+
   return (
     <html lang="tr" className="force-light" data-theme="light">
       <head>
-        {/* tarayıcıya yalnızca açık şema kullan dediğimiz meta */}
+        {/* Her zaman açık tema */}
         <meta name="color-scheme" content="light" />
+        {/* Bakım modundayken indexlenmesin */}
+        {isMaintenance && <meta name="robots" content="noindex, nofollow" />}
       </head>
       <body className="flex min-h-screen flex-col bg-white text-black">
-        <Navbar />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        {/* Navbar ve Footer bakım modunda gizlenir */}
+        {!isMaintenance && <Navbar />}
 
-        {/* Organization JSON-LD */}
+        <div className="flex-1">{children}</div>
+
+        {!isMaintenance && <Footer />}
+
+        {/* JSON-LD Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -38,7 +63,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "KW Alesta • KW Viya • KW Orsa",
-              url: process.env.NEXT_PUBLIC_SITE_URL || "https://kw-avo.vercel.app",
+              url:
+                process.env.NEXT_PUBLIC_SITE_URL ||
+                "https://kw-avo.vercel.app",
               logo: "/media/logos/kw-alestaviyaorsa.svg",
               sameAs: [],
             }),

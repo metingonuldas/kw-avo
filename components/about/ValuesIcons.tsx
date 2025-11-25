@@ -1,38 +1,45 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Handshake, Target, BookOpenCheck, UsersRound, Cpu, LineChart } from "lucide-react";
+import {
+  Handshake,
+  Target,
+  BookOpenCheck,
+  UsersRound,
+  Cpu,
+  LineChart,
+} from "lucide-react";
 
 const values = [
   {
     icon: Handshake,
     title: "Kazan–Kazan",
-    desc: "Şeffaflık, iş birliği ve paylaşım kültürü; birlikte büyürüz.",
+    desc: "Şeffaflık, iş birliği ve paylaşım kültürü; birlikte ve sürdürülebilir şekilde büyürüz.",
   },
   {
     icon: BookOpenCheck,
     title: "Eğitim & Koçluk",
-    desc: "Düzenli programlar ve rol oyunlarıyla uygulamalı gelişim.",
+    desc: "Düzenli eğitimler, rol oyunları ve bire bir koçlukla üretime dayalı gelişim.",
   },
   {
     icon: Cpu,
-    title: "Teknoloji",
-    desc: "CRM, otomasyon, raporlama ve tek panel yönetim.",
+    title: "Teknoloji Ekosistemi",
+    desc: "CRM, ilan portali entegrasyonları, dijital pazarlama araçları ve otomasyonla danışmanların tüm iş akışını güçlendiririz.",
   },
   {
     icon: UsersRound,
     title: "Topluluk",
-    desc: "Mentorluk, takım bazlı üretkenlik ve güçlü ağlar.",
+    desc: "Mentorluk, takım bazlı üretkenlik ve güçlü paylaşım ağı ile destekleyici bir kültür oluştururuz.",
   },
   {
     icon: Target,
     title: "Müşteri Odaklılık",
-    desc: "Servis kalitesi ve deneyimi her adımda iyileştiririz.",
+    desc: "Servis kalitesi, süreç hızı ve müşteri deneyimini her adımda iyileştiririz.",
   },
   {
     icon: LineChart,
     title: "Sürdürülebilir Üretim",
-    desc: "Pipeline ve kanallarda verimlilik ile kârlı büyüme.",
+    desc: "Ölçülebilir takip ve kârlı büyüme için doğru modeller uygularız.",
   },
 ];
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type Subject =
   | "Genel Bilgi"
@@ -91,10 +92,21 @@ export default function ContactForm() {
             className="mt-1 block w-full rounded-2xl border border-black/10 px-3 py-2 outline-none focus:ring-2 focus:ring-black/10"
             name="phone"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+90 5XX XXX XX XX"
+            onChange={(e) => {
+              const onlyNums = e.target.value.replace(/\D/g, ""); // sadece rakam
+              if (onlyNums.length <= 11) setPhone(onlyNums);
+            }}
+            placeholder="05XXXXXXXXX"
             autoComplete="tel"
+            required
+            minLength={11}
+            maxLength={11}
+            pattern="[0-9]{11}"
+            inputMode="numeric"
           />
+          <p className="mt-1 text-xs text-gray-500">
+            Telefon numarası 11 haneli olmalıdır.
+          </p>
         </div>
         <div>
           <label className="block text-sm font-medium">Konu</label>
@@ -138,26 +150,25 @@ export default function ContactForm() {
             className="mt-1 size-4 rounded border-gray-300"
             checked={agree1}
             onChange={(e) => setAgree1(e.target.checked)}
+            required
           />
           <span>
             Bu kutuyu işaretleyerek{" "}
-            <a
-              href="#"
+            <Link
+              href="/terms"
               className="underline"
-              onClick={(e) => e.preventDefault()}
-              aria-disabled
+              target="_blank"
             >
               Kullanım Şartları
-            </a>{" "}
+            </Link>{" "}
             ve{" "}
-            <a
-              href="#"
+            <Link
+              href="/privacy"
               className="underline"
-              onClick={(e) => e.preventDefault()}
-              aria-disabled
+              target="_blank"
             >
               Gizlilik Politikası
-            </a>
+            </Link>
             ’nı kabul etmiş olursun.
           </span>
         </label>

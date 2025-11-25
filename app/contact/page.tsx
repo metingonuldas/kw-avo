@@ -2,10 +2,31 @@
 import ContactForm from "@/components/forms/ContactForm";
 import Link from "next/link";
 
-export const metadata = {
-  title: "İletişim | KW Alesta • KW Viya • KW Orsa",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "İletişim",
   description:
     "KW Alesta (Bayraklı – Ege Perla), KW Viya (Çiğli) ve KW Orsa (Urla) ekiplerine ulaşın. Sorularınızı doğru ofise yönlendirelim.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "İletişim | KW Alesta • KW Viya • KW Orsa",
+    description:
+      "İzmir’de üç ofisimizle yanınızdayız. Formu doldurun, sizi doğru ekibe yönlendirelim.",
+    url: "/contact",
+    images: [
+      {
+        url: "/og?title=İletişim",
+        width: 1200,
+        height: 630,
+        alt: "İletişim | KW Alesta • KW Viya • KW Orsa",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og?title=İletişim"],
+  },
 };
 
 function ResourceItem({

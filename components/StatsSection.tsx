@@ -4,9 +4,26 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 const stats = [
-  { icon: "🏠", label: "ABD Satış Hacmi", value: "$370.8B" },
-  { icon: "👥", label: "Danışman", value: "165,000+" },
-  { icon: "🏆", label: "No. 1", value: "Ajan Sayısında Dünya Lideri" },
+  {
+    icon: "📍",
+    value: "3 Bölge Müdürlüğü",
+    label: "KW Alesta • KW Viya • KW Orsa",
+  },
+  {
+    icon: "👥",
+    value: "500+ Danışman",
+    label: "İzmir’de en geniş gayrimenkul danışmanı ağı",
+  },
+  {
+    icon: "🎓",
+    value: "500+ Saat / Yıl",
+    label: "Eğitim, koçluk ve mentorluk oturumları",
+  },
+  {
+    icon: "🚀",
+    value: "Üretime Odaklı Model",
+    label: "Teknoloji, pazarlama ve operasyon desteği",
+  },
 ];
 
 export default function StatsSection() {
@@ -16,16 +33,22 @@ export default function StatsSection() {
         {/* Sol metin + istatistikler */}
         <div>
           <h2 className="text-2xl sm:text-3xl font-semibold">
-            Her Yıl Zirveyi Zorluyoruz
+            Her Yıl Daha Güçlü Bir Organizasyon
           </h2>
           <p className="mt-3 text-sm text-gray-600">
-            Ajan sayısı, işlem sayısı ve satış hacminde dünyanın en büyük
-            gayrimenkul franchise’ları arasında yer alıyoruz.
+            KW Alesta, KW Viya ve KW Orsa olarak İzmir’de üç bölge müdürlüğü ve
+            500’ün üzerinde danışmanla; eğitim, teknoloji ve paylaşım kültürü
+            merkezli bir iş modeliyle büyümeye devam ediyoruz.
+          </p>
+          <p className="mt-2 text-sm text-gray-600">
+            Amacımız, danışmanlarımızın sürdürülebilir ve kârlı işler kurmasını
+            sağlayan güçlü bir altyapı sunmak: model, sistem, eğitim ve
+            operasyon desteği bir arada.
           </p>
 
           <ul className="mt-6 space-y-4">
             {stats.map((s, i) => (
-              <li key={s.label} className="flex items-start gap-4">
+              <li key={s.value} className="flex items-start gap-4">
                 <div className="text-2xl">{s.icon}</div>
                 <div>
                   <motion.div
@@ -43,14 +66,17 @@ export default function StatsSection() {
             ))}
           </ul>
 
-          <p className="mt-4 text-[11px] text-gray-400">*Veriler değişebilir.</p>
+          <p className="mt-4 text-[11px] text-gray-400">
+            *Rakamlar KWAVO organizasyonu için yaklaşık değerlerdir ve dönemsel
+            olarak güncellenebilir.
+          </p>
         </div>
 
         {/* Sağ görsel */}
         <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
           <Image
             src="/images/avo-stats.jpg"
-            alt="KWAVO İstatistikler"
+            alt="KWAVO organizasyon yapısı"
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"

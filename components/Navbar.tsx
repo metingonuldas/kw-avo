@@ -16,7 +16,9 @@ const primaryLinks = [
 
 /* Kurumsal alt menü */
 const corporateMenu = [
-  { href: "/leadership", label: "Liderlik" },
+  { href: "/leadership", label: "Lider Ekip" },
+  { href: "/scarlet", label: "Scarlet Koçluk Takımı" },
+  { href: "/culture-cards", label: "Kültür Kartları" }, // ✅ yeni sayfa
   { href: "/press", label: "Basın" },
   { href: "/technology", label: "Teknoloji" },
   { href: "/media", label: "Media Kit" },

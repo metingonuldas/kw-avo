@@ -1,26 +1,27 @@
+// app/og/route.tsx
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const title = (searchParams.get("title") ?? "KW Alesta • Viya • Orsa").slice(0, 80);
+export async function GET() {
+  // Sadece static PNG göstereceğiz → Next ImageResponse üzerinden PNG embed edeceğiz.
+  const imageUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/images/kw-hero-cover.png`;
 
   return new ImageResponse(
     (
-      <div style={{
-        display: "flex",
-        height: "100%",
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "white",
-        fontSize: 56,
-        fontWeight: 700,
-      }}>
-        {title}
-      </div>
+      <img
+        src={imageUrl}
+        alt="KWAVO"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
     ),
-    { width: 1200, height: 630 }
+    {
+      width: 1200,
+      height: 630,
+    }
   );
 }

@@ -18,7 +18,7 @@ export default function LeadershipTeaser() {
         >
           <div className="aspect-[4/3] relative rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
             <Image
-              src="/images/avo-leaders.jpg"
+              src="/images/avo-leadership-min.jpg"
               alt="Liderlik Ekibi"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"

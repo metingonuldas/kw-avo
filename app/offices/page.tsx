@@ -2,6 +2,33 @@
 import { getAllOffices } from "@/lib/offices";
 import OfficeMap from "@/components/OfficeMap";
 import { MapPinned, Phone, MapPin } from "lucide-react";
+// app/offices/page.tsx
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Ofislerimiz",
+  description:
+    "KW Alesta (Bayraklı – Ege Perla), KW Viya (Çiğli) ve KW Orsa (Urla) ofislerimizi keşfedin. İzmir’in her bölgesinde gayrimenkul danışmanlık hizmeti sunuyoruz.",
+  alternates: { canonical: "/offices" },
+  openGraph: {
+    title: "Ofislerimiz | KW Alesta • KW Viya • KW Orsa",
+    description:
+      "İzmir’de üç lokasyon: Bayraklı, Çiğli ve Urla. Doğru ekibe kolayca ulaşın.",
+    url: "/offices",
+    images: [
+      {
+        url: "/og?title=Ofislerimiz",
+        width: 1200,
+        height: 630,
+        alt: "KWAVO Ofislerimiz",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og?title=Ofislerimiz"],
+  },
+};
 
 export const dynamic = "force-static";
 

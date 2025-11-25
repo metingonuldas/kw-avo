@@ -5,10 +5,31 @@ import Image from "next/image";
 import Link from "next/link";
 import TechnologyHero from "@/components/technology/TechnologyHero";
 
-export const metadata = {
-  title: "Teknoloji | KW Alesta • KW Viya • KW Orsa",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Teknoloji ve İş Ortaklıkları",
   description:
-    "KW Command ile CRM, pazarlama, otomasyon ve raporlama tek ekranda. Masaüstü ve mobil uygulamalarla üretimi hızlandırın.",
+    "KW Command, dijital pazarlama araçları ve iş ortaklıklarıyla danışmanlarımızın işini tek ekosistemde kolaylaştırıyoruz.",
+  alternates: { canonical: "/technology" },
+  openGraph: {
+    title: "Teknoloji ve İş Ortaklıkları | KW Alesta • KW Viya • KW Orsa",
+    description:
+      "CRM, otomasyon, raporlama, dijital pazarlama ve entegrasyonlarla üretimi artıran teknoloji ekosistemi.",
+    url: "/technology",
+    images: [
+      {
+        url: "/og?title=Teknoloji%20ve%20İş%20Ortaklıkları",
+        width: 1200,
+        height: 630,
+        alt: "KWAVO Teknoloji",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og?title=Teknoloji%20ve%20İş%20Ortaklıkları"],
+  },
 };
 
 export default function TechnologyPage() {
