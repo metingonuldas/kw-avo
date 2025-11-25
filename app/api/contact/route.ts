@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     }
 
     await resend.emails.send({
-      from: process.env.CONTACT_FROM || "onboarding@resend.dev",
+      from: `KWAVO <${process.env.CONTACT_FROM || "iletisim@kwavo.net"}>`,
       to: toList,
       subject: `Yeni iletişim formu: ${name}`,
       html: lines,
