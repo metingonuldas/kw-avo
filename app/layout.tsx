@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react"; // YENİ EKLENEN SATIR 👇
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://kw-avo.vercel.app"),
@@ -56,8 +57,9 @@ export default async function RootLayout({
 
         {!isMaintenance && <Footer />}
 
-        {/* Vercel Speed Insights Bileşeni Buraya Eklendi 👇 */}
+        {/* Vercel Araçları 👇 */}
         <SpeedInsights />
+        <Analytics /> 
 
         {/* JSON-LD Schema */}
         <script
