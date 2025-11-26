@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://kw-avo.vercel.app"),
@@ -54,6 +55,9 @@ export default async function RootLayout({
         <div className="flex-1">{children}</div>
 
         {!isMaintenance && <Footer />}
+
+        {/* Vercel Speed Insights Bileşeni Buraya Eklendi 👇 */}
+        <SpeedInsights />
 
         {/* JSON-LD Schema */}
         <script
