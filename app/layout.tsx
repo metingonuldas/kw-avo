@@ -5,7 +5,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react"; // YENİ EKLENEN SATIR 👇
+import { Analytics } from "@vercel/analytics/react";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://kw-avo.vercel.app"),
@@ -57,9 +58,16 @@ export default async function RootLayout({
 
         {!isMaintenance && <Footer />}
 
-        {/* Vercel Araçları 👇 */}
+        {/* --- ANALİTİK VE PERFORMANS ARAÇLARI --- */}
+        
+        {/* 1. Vercel Hız Ölçümü */}
         <SpeedInsights />
+        
+        {/* 2. Vercel Basit Analiz */}
         <Analytics /> 
+
+        {/* 3. Google Analytics 4 (Senin Kodun) */}
+        <GoogleAnalytics gaId="G-ZYB6BQGKQ5" />
 
         {/* JSON-LD Schema */}
         <script
