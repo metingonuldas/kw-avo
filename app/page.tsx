@@ -1,12 +1,13 @@
+// app/page.tsx
 import HeroSection from "@/components/HeroSection";
 import MarqueeNews from "@/components/MarqueeNews";
 import FeatureCards from "@/components/FeatureCards";
 import StatsSection from "@/components/StatsSection";
-// app/page.tsx
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kwavo.net"), // domain prod'a geçince bu
+  metadataBase: new URL("https://kwavo.net"),
   title: {
     default: "KW Alesta Viya Orsa | Girişimcilerin Geliştiği Yer.",
     template: "%s | KWAVO",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     siteName: "KWAVO",
     images: [
       {
-        url: "/og/default.png", // public/og/default.png koyacağız
+        url: "/og/default.png",
         width: 1200,
         height: 630,
         alt: "KW Alesta • KW Viya • KW Orsa",
@@ -38,7 +39,7 @@ export default function HomePage() {
       {/* 1) Latest news */}
       <MarqueeNews />
 
-      {/* 2) Hero (sende zaten hazır) */}
+      {/* 2) Hero */}
       <HeroSection />
 
       {/* 3) Hover'lı kartlar */}

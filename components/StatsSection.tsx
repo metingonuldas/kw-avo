@@ -66,10 +66,10 @@ export default function StatsSection() {
             ))}
           </ul>
 
-          <p className="mt-4 text-[11px] text-gray-400">
-            *Rakamlar KWAVO organizasyonu için yaklaşık değerlerdir ve dönemsel
-            olarak güncellenebilir.
-          </p>
+        <p className="text-sm text-muted-foreground mt-2">
+          İstatistikler KWAVO organizasyonunun güncel durumunu yansıtmak amacıyla
+          periyodik olarak güncellenen yaklaşık değerlerdir.
+        </p>
         </div>
 
         {/* Sağ görsel */}
