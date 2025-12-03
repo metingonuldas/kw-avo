@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+// Önizleme ortamında next/link hatasını önlemek için standart <a> etiketi kullanıyoruz.
+// Gerçek projede: import Link from "next/link";
+import OfficeSelect from "./OfficeSelect";
 
 type Subject =
   | "Genel Bilgi"
@@ -10,11 +12,22 @@ type Subject =
   | "Basın / Medya"
   | "Diğer";
 
+// Ofis seçenekleri
+const OFFICE_OPTIONS = [
+  { value: "KW Alesta", label: "KW Alesta (Bayraklı - Ege Perla)" },
+  { value: "KW Viya", label: "KW Viya (Çiğli)" },
+  { value: "KW Orsa", label: "KW Orsa (Urla)" },
+];
+
 export default function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState<Subject>("Genel Bilgi");
+  
+  // YENİ STATE: Ofis seçimi için
+  const [office, setOffice] = useState(""); 
+
   const [message, setMessage] = useState("");
   const [agree1, setAgree1] = useState(false);
   const [agree2, setAgree2] = useState(false);
@@ -26,35 +39,47 @@ export default function ContactForm() {
     setSubmitting(true);
     setOk(null);
 
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        name,
-        email,
-        phone,
-        subject,
-        message,
-        consent_terms: agree1,
-        consent_marketing: agree2,
-      }),
-    });
+    // API'ye gönderilecek veriyi hazırlıyoruz
+    const payload = {
+      name,
+      email,
+      phone,
+      subject,
+      message,
+      // Eğer danışmanlık seçildiyse ofisi gönder, değilse boş gönder
+      office: subject === "Danışman Olmak İstiyorum" ? office : "Belirtilmemiş",
+      consent_terms: agree1,
+      consent_marketing: agree2,
+    };
 
-    setSubmitting(false);
-    setOk(res.ok);
-    if (res.ok) {
-      setName("");
-      setEmail("");
-      setPhone("");
-      setSubject("Genel Bilgi");
-      setMessage("");
-      setAgree1(false);
-      setAgree2(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      setSubmitting(false);
+      setOk(res.ok);
+      if (res.ok) {
+        // Formu sıfırla
+        setName("");
+        setEmail("");
+        setPhone("");
+        setSubject("Genel Bilgi");
+        setOffice(""); 
+        setMessage("");
+        setAgree1(false);
+        setAgree2(false);
+      }
+    } catch (error) {
+      setSubmitting(false);
+      setOk(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-4 font-sans text-gray-900">
       {/* Ad Soyad + E-posta */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
@@ -93,7 +118,7 @@ export default function ContactForm() {
             name="phone"
             value={phone}
             onChange={(e) => {
-              const onlyNums = e.target.value.replace(/\D/g, ""); // sadece rakam
+              const onlyNums = e.target.value.replace(/\D/g, "");
               if (onlyNums.length <= 11) setPhone(onlyNums);
             }}
             placeholder="05XXXXXXXXX"
@@ -129,6 +154,22 @@ export default function ContactForm() {
         </div>
       </div>
 
+      {/* --- DİNAMİK OFİS SEÇİMİ --- */}
+      {subject === "Danışman Olmak İstiyorum" && (
+        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+          <label className="block text-sm font-medium mb-1 text-red-600">
+            Hangi ofisimizle ilgileniyorsunuz?
+          </label>
+          <OfficeSelect
+            name="office"
+            options={OFFICE_OPTIONS}
+            value={office}
+            onChange={setOffice}
+            placeholder="Ofis Seçiniz (Zorunlu değil ama önerilir)"
+          />
+        </div>
+      )}
+
       {/* Mesaj */}
       <div>
         <label className="block text-sm font-medium">Mesaj</label>
@@ -144,39 +185,41 @@ export default function ContactForm() {
 
       {/* Aydınlatma & İzinler */}
       <div className="space-y-3 text-sm text-gray-700">
-        <label className="flex items-start gap-3">
+        <label className="flex items-start gap-3 cursor-pointer select-none">
           <input
             type="checkbox"
-            className="mt-1 size-4 rounded border-gray-300"
+            className="mt-1 size-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
             checked={agree1}
             onChange={(e) => setAgree1(e.target.checked)}
             required
           />
           <span>
             Bu kutuyu işaretleyerek{" "}
-            <Link
+            <a
               href="/terms"
-              className="underline"
+              className="underline hover:text-red-600"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Kullanım Şartları
-            </Link>{" "}
+            </a>{" "}
             ve{" "}
-            <Link
+            <a
               href="/privacy"
-              className="underline"
+              className="underline hover:text-red-600"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Gizlilik Politikası
-            </Link>
+            </a>
             ’nı kabul etmiş olursun.
           </span>
         </label>
 
-        <label className="flex items-start gap-3">
+        <label className="flex items-start gap-3 cursor-pointer select-none">
           <input
             type="checkbox"
-            className="mt-1 size-4 rounded border-gray-300"
+            className="mt-1 size-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
             checked={agree2}
             onChange={(e) => setAgree2(e.target.checked)}
           />
@@ -191,19 +234,31 @@ export default function ContactForm() {
       <div className="pt-2">
         <button
           disabled={submitting}
-          className="inline-flex w-full items-center justify-center rounded-2xl bg-red-600 px-4 py-2.5 font-medium text-white hover:opacity-90 disabled:opacity-50 sm:w-auto"
+          className="inline-flex w-full items-center justify-center rounded-2xl bg-[#ba0c2f] px-6 py-3 font-medium text-white transition-all hover:bg-[#a00a29] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
         >
-          {submitting ? "Gönderiliyor..." : "Gönder"}
+          {submitting ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Gönderiliyor...
+            </>
+          ) : "Gönder"}
         </button>
+        
         {ok === true && (
-          <p className="mt-2 text-sm text-green-600">
-            Teşekkürler! Mesajın alındı.
-          </p>
+          <div className="mt-4 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 animate-in fade-in slide-in-from-top-2">
+            <p className="font-medium">Teşekkürler! Mesajın başarıyla alındı.</p>
+            <p className="text-sm mt-1">Ekibimiz en kısa sürede dönüş yapacaktır.</p>
+          </div>
         )}
+        
         {ok === false && (
-          <p className="mt-2 text-sm text-red-600">
-            Üzgünüz, bir sorun oluştu. Lütfen tekrar dene.
-          </p>
+          <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 animate-in fade-in slide-in-from-top-2">
+            <p className="font-medium">Üzgünüz, bir sorun oluştu.</p>
+            <p className="text-sm mt-1">Lütfen internet bağlantınızı kontrol edip tekrar deneyin.</p>
+          </div>
         )}
       </div>
     </form>

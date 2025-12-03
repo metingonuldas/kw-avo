@@ -33,7 +33,7 @@ export default function OfficeSelect({
     );
   }, [options, q]);
 
-  // dışarı tıklayınca kapat
+  // Dışarı tıklayınca kapat
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -46,7 +46,7 @@ export default function OfficeSelect({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  // klavye
+  // Klavye kontrolleri
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (!open && (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
@@ -79,7 +79,7 @@ export default function OfficeSelect({
 
   return (
     <div ref={containerRef} className="relative" onKeyDown={onKeyDown}>
-      {/* hidden input: form fallback */}
+      {/* Hidden input: Form gönderimi için */}
       <input type="hidden" name={name} value={value ?? ""} />
 
       <button
@@ -92,6 +92,7 @@ export default function OfficeSelect({
         <span className={selected ? "" : "text-gray-500"}>
           {selected ? selected.label : placeholder}
         </span>
+        {/* Aşağı ok ikonu */}
         <svg width="18" height="18" viewBox="0 0 20 20" className={`transition-transform ${open ? "rotate-180" : ""}`}>
           <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="2" fill="none" />
         </svg>

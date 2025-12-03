@@ -12,6 +12,10 @@ const SUBJECTS = [
 ] as const;
 type Subject = (typeof SUBJECTS)[number];
 
+// Yeni eklenen Ofis Seçenekleri
+const OFFICES = ["KW Alesta", "KW Viya", "KW Orsa"] as const;
+type Office = (typeof OFFICES)[number];
+
 function isEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
@@ -25,6 +29,9 @@ export async function POST(req: Request) {
     const message = String(body?.message || "").trim();
     const phone = String(body?.phone || "").trim();
     const subject = (body?.subject as Subject) || "Genel Bilgi";
+    // Yeni eklenen alan: Ofis seçimi (Opsiyonel olabilir, sadece danışmanlıkta zorunlu olabilir)
+    const office = (body?.office as Office) || "Belirtilmemiş"; 
+    
     const consent_terms = Boolean(body?.consent_terms);
     const consent_marketing = Boolean(body?.consent_marketing);
 
@@ -35,10 +42,16 @@ export async function POST(req: Request) {
     if (!consent_terms) return NextResponse.json({ error: "consent_required" }, { status: 400 });
     if (phone && !/^\d{11}$/.test(phone)) return NextResponse.json({ error: "invalid_phone" }, { status: 400 });
 
+    // Eğer konu "Danışman Olmak İstiyorum" ise ve ofis seçilmemişse hata döndürebiliriz (İsteğe bağlı)
+    /*
+    if (subject === "Danışman Olmak İstiyorum" && office === "Belirtilmemiş") {
+       return NextResponse.json({ error: "missing_office" }, { status: 400 });
+    }
+    */
+
     const safeSubject = SUBJECTS.includes(subject) ? subject : "Genel Bilgi";
 
     // --- Modern HTML E-posta Şablonu ---
-    // KW Kurumsal Renkleri: Kırmızı (#ba0c2f), Koyu Gri (#333)
     const htmlTemplate = `
     <!DOCTYPE html>
     <html>
@@ -90,9 +103,15 @@ export async function POST(req: Request) {
             <div class="value"><a href="mailto:${email}">${email}</a></div>
           </div>
 
-          <div class="field">
-            <span class="label">Konu</span>
-            <div class="value">${safeSubject}</div>
+          <div style="display: flex; gap: 20px;">
+            <div class="field" style="flex: 1;">
+              <span class="label">Konu</span>
+              <div class="value">${safeSubject}</div>
+            </div>
+            <div class="field" style="flex: 1;">
+              <span class="label">Tercih Edilen Ofis</span>
+              <div class="value" style="color: #ba0c2f; font-weight: 700;">${office}</div>
+            </div>
           </div>
 
           <div class="field">
@@ -135,7 +154,7 @@ export async function POST(req: Request) {
     await resend.emails.send({
       from: `KWAVO <${process.env.CONTACT_FROM || "iletisim@kwavo.net"}>`,
       to: toList,
-      subject: `Yeni Talep: ${name} - ${safeSubject}`, // Konuyu biraz daha dikkat çekici yaptım
+      subject: `Yeni Talep: ${name} - ${safeSubject} (${office})`, // Konuya da ofisi ekledim
       html: htmlTemplate,
     });
 
