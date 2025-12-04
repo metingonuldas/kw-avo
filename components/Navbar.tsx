@@ -10,17 +10,17 @@ const primaryLinks = [
   { href: "/", label: "Ana Sayfa" },
   { href: "/about", label: "Hakkımızda" },
   { href: "/offices", label: "Ofisler" },
-  { href: "/projects",  label: "Projeler" },
+  { href: "/technology", label: "Teknoloji" },
   { href: "/contact", label: "İletişim" },
 ];
 
 /* Kurumsal alt menü */
 const corporateMenu = [
   { href: "/leadership", label: "Lider Ekip" },
+  { href: "/projects",  label: "Projeler" },
   { href: "/scarlet", label: "Scarlet Koçluk Takımı" },
   { href: "/culture-cards", label: "Kültür Kartları" },
   { href: "/press", label: "Basın" },
-  { href: "/technology", label: "Teknoloji" },
   { href: "/media", label: "Media Kit" },
 ];
 
