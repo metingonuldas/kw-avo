@@ -18,13 +18,12 @@ const primaryLinks = [
 const corporateMenu = [
   { href: "/leadership", label: "Lider Ekip" },
   { href: "/scarlet", label: "Scarlet Koçluk Takımı" },
-  { href: "/culture-cards", label: "Kültür Kartları" }, // ✅ yeni sayfa
+  { href: "/culture-cards", label: "Kültür Kartları" },
   { href: "/press", label: "Basın" },
   { href: "/technology", label: "Teknoloji" },
   { href: "/media", label: "Media Kit" },
 ];
 
-/* Dropdown animasyonları (desktop) */
 const dropdownVariants: Variants = {
   hidden: { opacity: 0, y: -6, scale: 0.98 },
   show: {
@@ -67,7 +66,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/80 backdrop-blur">
       <nav className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
+        {/* Logo - Next/Link ve Next/Image kullanımı */}
         <Link href="/" className="flex items-center">
           <Image
             src="/media/logos/kw-alestaviyaorsa.svg"
@@ -92,7 +91,7 @@ export default function Navbar() {
             </li>
           ))}
 
-          {/* Kurumsal */}
+          {/* Kurumsal Dropdown */}
           <li className="relative" ref={corpMenuRef}>
             <button
               className="inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors"
@@ -137,13 +136,31 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* Sağ CTA */}
-        <Link
-          href="/contact"
-          className="hidden md:inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium bg-black text-white hover:opacity-90"
-        >
-          Danışman Ol
-        </Link>
+        {/* Sağ Butonlar */}
+        <div className="hidden md:flex items-center gap-3">
+          {/* İlan Portalı (Dış Link -> a etiketi kalır, target="_blank" olduğu için Link kullanılmaz) */}
+          <a
+            href="https://kwavo.com.tr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-[#ba0c2f] border-2 border-[#ba0c2f] hover:bg-[#ba0c2f] hover:text-white transition-all active:scale-95"
+          >
+            İlanlar
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M15 3h6v6" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M10 14L21 3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
+
+          {/* Danışman Ol (İç Link -> Link bileşeni) */}
+          <Link
+            href="/contact"
+            className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium bg-black text-white hover:opacity-90 transition-opacity border-2 border-transparent"
+          >
+            Danışman Ol
+          </Link>
+        </div>
 
         {/* Mobil hamburger */}
         <button
@@ -154,27 +171,12 @@ export default function Navbar() {
             if (!next) setMobileCorpOpen(false);
           }}
           aria-expanded={mobileOpen}
-          aria-controls="mobile-menu"
           aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
         >
           {mobileOpen ? (
-            <svg width="22" height="22" viewBox="0 0 24 24">
-              <path
-                d="M6 6l12 12M18 6L6 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
           ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24">
-              <path
-                d="M4 6h16M4 12h16M4 18h16"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
           )}
         </button>
       </nav>
@@ -183,7 +185,6 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            id="mobile-menu"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -191,7 +192,6 @@ export default function Navbar() {
             className="md:hidden border-t border-black/5 bg-white overflow-hidden"
           >
             <div className="mx-auto max-w-6xl px-4 py-3 text-sm">
-              {/* Düz linkler */}
               <div className="space-y-1">
                 {primaryLinks.map((l) => (
                   <Link
@@ -205,34 +205,23 @@ export default function Navbar() {
                 ))}
               </div>
 
-              {/* Kurumsal accordion */}
               <button
                 className="mt-2 flex w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-50"
                 onClick={() => setMobileCorpOpen((v) => !v)}
-                aria-expanded={mobileCorpOpen}
-                aria-controls="mobile-corporate"
               >
                 <span>Kurumsal</span>
                 <motion.svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 20 20"
+                  width="18" height="18" viewBox="0 0 20 20"
                   animate={{ rotate: mobileCorpOpen ? 180 : 0 }}
                   transition={{ duration: 0.16 }}
                 >
-                  <path
-                    d="M5 7l5 5 5-5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                  />
+                  <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="2" fill="none" />
                 </motion.svg>
               </button>
 
               <AnimatePresence initial={false}>
                 {mobileCorpOpen && (
                   <motion.div
-                    id="mobile-corporate"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
@@ -245,10 +234,7 @@ export default function Navbar() {
                           key={m.href}
                           href={m.href}
                           className="block rounded-lg px-3 py-2 hover:bg-gray-50"
-                          onClick={() => {
-                            setMobileOpen(false);
-                            setMobileCorpOpen(false);
-                          }}
+                          onClick={() => { setMobileOpen(false); setMobileCorpOpen(false); }}
                         >
                           {m.label}
                         </Link>
@@ -258,14 +244,29 @@ export default function Navbar() {
                 )}
               </AnimatePresence>
 
-              {/* CTA */}
-              <Link
-                href="/contact"
-                className="mt-3 block rounded-lg px-3 py-2 bg-black text-white text-center font-medium hover:opacity-90"
-                onClick={() => setMobileOpen(false)}
-              >
-                Danışman Ol
-              </Link>
+              <div className="mt-4 pt-4 border-t border-black/5 grid gap-3">
+                <a
+                  href="https://kwavo.com.tr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-2 border border-[#ba0c2f] text-[#ba0c2f] text-center font-bold hover:bg-[#ba0c2f] hover:text-white transition-colors"
+                >
+                  İlan Portalı
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M15 3h6v6" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M10 14L21 3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+                
+                <Link
+                  href="/contact"
+                  className="block rounded-lg px-3 py-2 bg-black text-white text-center font-medium hover:opacity-90"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Danışman Ol
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

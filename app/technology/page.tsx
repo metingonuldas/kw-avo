@@ -1,9 +1,9 @@
-// app/technology/page.tsx
 export const dynamic = "force-static";
 
 import Image from "next/image";
 import Link from "next/link";
 import TechnologyHero from "@/components/technology/TechnologyHero";
+import CommandLoginSection from "@/components/CommandLoginSection";
 
 import type { Metadata } from "next";
 
@@ -12,79 +12,21 @@ export const metadata: Metadata = {
   description:
     "KW Command, dijital pazarlama araçları ve iş ortaklıklarıyla danışmanlarımızın işini tek ekosistemde kolaylaştırıyoruz.",
   alternates: { canonical: "/technology" },
-  openGraph: {
-    title: "Teknoloji ve İş Ortaklıkları | KW Alesta • KW Viya • KW Orsa",
-    description:
-      "CRM, otomasyon, raporlama, dijital pazarlama ve entegrasyonlarla üretimi artıran teknoloji ekosistemi.",
-    url: "/technology",
-    images: [
-      {
-        url: "/og?title=Teknoloji%20ve%20İş%20Ortaklıkları",
-        width: 1200,
-        height: 630,
-        alt: "KWAVO Teknoloji",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    images: ["/og?title=Teknoloji%20ve%20İş%20Ortaklıkları"],
-  },
 };
 
 export default function TechnologyPage() {
   return (
-    <main className="mx-auto max-w-6xl px-4 sm:px-6">
+    <main className="mx-auto max-w-6xl px-4 sm:px-6 pb-12">
       <TechnologyHero />
       
-      {/* HERO — Laptop görseli + metin */}
-      <section className="relative mt-6 overflow-hidden rounded-2xl">
-        <div className="relative h-[46vh] min-h-[360px] w-full">
-          <Image
-            src="/images/avo-command-laptop.png"
-            alt="KW Command masaüstü uygulaması"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-        </div>
+      <div className="mt-8">
+        <CommandLoginSection />
+      </div>
 
-        <div className="absolute inset-0 grid place-items-center px-4">
-          <div className="mx-auto w-full max-w-3xl text-center text-white drop-shadow
-                          opacity-100 translate-y-0 transition">
-            <h1 className="text-2xl sm:text-4xl font-semibold">
-              KW Command: Tüm İşiniz Tek Platformda
-            </h1>
-            <p className="mt-3 text-sm sm:text-base text-white/90">
-              CRM, fırsat yönetimi, akış otomasyonları, pazarlama ve raporlama — hepsi
-              aynı ekranda. Danışmanlarımızın üretimini artırmak için tasarlandı.
-            </p>
-            <div className="mt-5 flex items-center justify-center gap-3">
-              <Link
-                href="/contact"
-                className="inline-flex items-center rounded-xl bg-white px-4 py-2 text-sm font-medium text-black hover:opacity-90"
-              >
-                Bilgi Al
-              </Link>
-              <Link
-                href="/about"
-                className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-white/70 text-white hover:bg-white/10"
-              >
-                Nasıl Çalışıyoruz?
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* GRID — Masaüstü & Mobil mockup + metinler */}
       <section className="py-12">
         <div className="grid gap-8 md:grid-cols-2 items-start">
           {/* Masaüstü kartı */}
-          <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden
-                          opacity-100 translate-y-0 transition">
+          <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden opacity-100 translate-y-0 transition hover:shadow-md">
             <div className="relative aspect-[16/10] bg-gray-50">
               <Image
                 src="/images/avo-command-laptop.png"
@@ -110,8 +52,7 @@ export default function TechnologyPage() {
           </div>
 
           {/* Mobil kartı */}
-          <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden
-                          opacity-100 translate-y-0 transition">
+          <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden opacity-100 translate-y-0 transition hover:shadow-md">
             <div className="relative aspect-[3/4] bg-gray-50">
               <Image
                 src="/images/avo-command-mobile.png"
