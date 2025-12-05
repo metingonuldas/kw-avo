@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
@@ -42,6 +41,44 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const isMaintenance = cookieStore.get("mw_maint")?.value === "1";
 
+  // Gelişmiş Schema.org Yapısal Verisi (Organization + WebSite)
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://kwavo.net/#organization",
+        "name": "KW Alesta • KW Viya • KW Orsa",
+        "url": "https://kwavo.net",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://kwavo.net/media/logos/kw-alestaviyaorsa.svg"
+        },
+        "sameAs": [
+          "https://www.instagram.com/kwalestaviyaorsa",
+          "https://www.linkedin.com/company/kwalestaviyaorsa",
+          "https://www.facebook.com/kwalestaviyaorsa" // Varsa ekle veya kaldır
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+90-232-000-0000", // BURAYI GÜNCELLE: Gerçek numaranı yaz
+          "contactType": "customer service",
+          "areaServed": "TR",
+          "availableLanguage": "Turkish"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://kwavo.net/#website",
+        "url": "https://kwavo.net",
+        "name": "KWAVO",
+        "description": "Girişimcinin geliştiği yer.",
+        "publisher": { "@id": "https://kwavo.net/#organization" },
+        "inLanguage": "tr-TR"
+      }
+    ]
+  };
+
   return (
     <html lang="tr" className="force-light" data-theme="light">
       <head>
@@ -66,24 +103,13 @@ export default async function RootLayout({
         {/* 2. Vercel Basit Analiz */}
         <Analytics /> 
 
-        {/* 3. Google Analytics 4 (Senin Kodun) */}
+        {/* 3. Google Analytics 4 */}
         <GoogleAnalytics gaId="G-ZYB6BQGKQ5" />
 
-        {/* JSON-LD Schema */}
+        {/* 4. JSON-LD Schema (Google Sitelinks için Kritik) */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "KW Alesta • KW Viya • KW Orsa",
-              url:
-                process.env.NEXT_PUBLIC_SITE_URL ||
-                "https://kw-avo.vercel.app",
-              logo: "/media/logos/kw-alestaviyaorsa.svg",
-              sameAs: [],
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </body>
     </html>
