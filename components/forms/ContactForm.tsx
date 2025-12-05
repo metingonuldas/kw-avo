@@ -179,7 +179,7 @@ export default function ContactForm() {
           required
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Bize nasıl yardımcı olabiliriz?"
+          placeholder="Size nasıl yardımcı olabiliriz?"
         />
       </div>
 
