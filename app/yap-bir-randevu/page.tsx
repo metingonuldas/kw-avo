@@ -67,7 +67,7 @@ export default function AppointmentGamePage() {
         </h1>
         <p className="text-lg text-gray-600">
           Randevunu al, sisteme gir, çarkı çevir ve anında hediyeni kazan! 
-          <br className="hidden md:block"/> Bol şanslar Danışmanım! 🚀
+          <br className="hidden md:block"/> Bol şanslar Dileriz! 🚀
         </p>
       </div>
 
