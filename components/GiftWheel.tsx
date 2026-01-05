@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 
 interface GiftWheelProps {
@@ -12,15 +12,32 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const controls = useAnimation();
   
-  // Dönüş açısını hafızada tutmak için useRef kullanıyoruz.
-  // Böylece her çevirişte sıfırdan başlamak yerine kaldığımız yerden devam edeceğiz.
+  // Ses referansları
+  const spinAudioRef = useRef<HTMLAudioElement | null>(null);
+  const winAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // useRef ile dönüş açısını hafızada tutuyoruz
   const rotationRef = useRef(0);
   
-  // KW Kurumsal Renk Paleti (Kırmızı, Siyah, Gri tonları)
   const colors = ["#ba0c2f", "#111111", "#991b1b", "#333333", "#dc2626", "#555555"];
-
   const numSegments = items.length;
   const segmentAngle = 360 / numSegments;
+
+  // Ses dosyalarını yükle (Tarayıcıda çalıştığından emin olmak için useEffect içinde)
+  useEffect(() => {
+    // Ses dosyalarının public/sounds klasöründe olduğunu varsayıyoruz
+    spinAudioRef.current = new Audio("/sounds/spin.mp3");
+    winAudioRef.current = new Audio("/sounds/win.mp3");
+    
+    // Ses ayarları (İsteğe bağlı)
+    if (spinAudioRef.current) {
+        spinAudioRef.current.loop = true; // Dönüş sesi sürekli çalsın
+        spinAudioRef.current.volume = 0.5; // Ses seviyesi
+    }
+    if (winAudioRef.current) {
+        winAudioRef.current.volume = 0.8;
+    }
+  }, []);
 
   // Dilimleri oluşturacak CSS Gradyan kodu
   const gradientString = items
@@ -36,12 +53,17 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
     if (isSpinning) return;
 
     setIsSpinning(true);
+    
+    // Dönüş sesini başlat
+    if (spinAudioRef.current) {
+        spinAudioRef.current.currentTime = 0;
+        spinAudioRef.current.play().catch(e => console.log("Ses çalma hatası:", e));
+    }
 
     const randomIndex = Math.floor(Math.random() * numSegments);
     const extraSpins = 5; // Her seferinde en az 5 tam tur dönsün
     
     // Hedefin (Seçilen ödülün) merkez açısını hesapla
-    // Çark saat yönünde döneceği için hedefi 0 noktasına (tepeye) getirmek için gereken açıyı buluyoruz.
     const segmentCenter = randomIndex * segmentAngle + segmentAngle / 2;
     const targetAngle = 360 - segmentCenter;
 
@@ -54,32 +76,45 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
     // Hedefe ulaşmak için gereken farkı hesapla
     let adjustment = targetAngle - normalizedRotation;
     
-    // Hep ileri gitmek istiyoruz, eğer fark negatifse (yani hedef geride kaldıysa) bir tam tur ekleyerek ileri atalım
+    // Hep ileri gitmek istiyoruz
     if (adjustment < 0) {
       adjustment += 360;
     }
     
-    // Yeni toplam açı: Mevcut + (5 Tam Tur) + Ayarlama Payı
+    // Yeni toplam açı
     const newTotalRotation = currentRotation + (360 * extraSpins) + adjustment;
 
-    // Yeni değeri kaydet (Bir sonraki tur için buradan devam edeceğiz)
+    // Yeni değeri kaydet
     rotationRef.current = newTotalRotation;
 
     await controls.start({
       rotate: newTotalRotation,
       transition: { 
         duration: 5, 
-        ease: [0.16, 1, 0.3, 1] // Özel Bezier eğrisi: Hızlı başla, sonda yavaşça ve tok bir şekilde dur (Geri yaylanma yok)
+        ease: [0.16, 1, 0.3, 1] 
       },
     });
 
+    // Dönüş bittiğinde
     setIsSpinning(false);
+    
+    // Dönüş sesini durdur
+    if (spinAudioRef.current) {
+        spinAudioRef.current.pause();
+        spinAudioRef.current.currentTime = 0;
+    }
+    
+    // Kazanma sesini çal
+    if (winAudioRef.current) {
+        winAudioRef.current.play().catch(e => console.log("Ses çalma hatası:", e));
+    }
+
     onSpinEnd(items[randomIndex]);
   };
 
   return (
     <div className="flex flex-col items-center justify-center w-full py-8">
-      {/* Gösterge Oku (Tam ortada üstte) */}
+      {/* Gösterge Oku */}
       <div className="relative z-20 -mb-6 drop-shadow-xl">
         <div className="h-12 w-10 bg-white border-4 border-gray-900" 
              style={{ 
@@ -95,14 +130,12 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
           animate={controls}
           initial={{ rotate: 0 }}
           style={{
-            // Mobilde ekranın %90'ı kadar, Masaüstünde max 500px
             width: "min(90vw, 500px)",
             height: "min(90vw, 500px)",
             background: `conic-gradient(${gradientString})`,
           }}
         >
           {items.map((item, index) => {
-            // Her yazıyı kendi diliminin tam ortasına hizalamak için açı hesabı
             const rotation = segmentAngle * index + segmentAngle / 2;
             
             return (
@@ -113,12 +146,11 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
                   transform: `rotate(${rotation}deg)`,
                 }}
               >
-                {/* Yazı Metni */}
                 <div className="pt-4 sm:pt-8 h-1/2 flex flex-col justify-start items-center">
                    <span
                     className="text-white font-bold uppercase tracking-wider text-[10px] sm:text-xs md:text-sm drop-shadow-md text-center px-1"
                     style={{
-                      writingMode: "vertical-rl", // Dikey yazı modu
+                      writingMode: "vertical-rl",
                       textOrientation: "mixed",
                     }}
                   >
