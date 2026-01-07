@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const PRIZES = [
   "YO Elinden Türk Kahvesi",
   "Not Defteri ",
-  "Muharrem Ünaldılar ile 1 e 1",
+  "Muharrem Ünaldılar ile bire bir",
   "Kahve Fincanı",
   "Takım Lideri Özel Hedef Oturumu",
   "Post-it ve Fosforlu Kalem",

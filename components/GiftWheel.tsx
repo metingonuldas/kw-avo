@@ -16,23 +16,25 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
   const spinAudioRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // useRef ile dönüş açısını hafızada tutuyoruz
+  // useRef ile dönüş açısını hafızada tutuyoruz (Sürekli ileri dönüş için)
   const rotationRef = useRef(0);
   
+  // KW Kurumsal Renk Paleti
   const colors = ["#ba0c2f", "#111111", "#991b1b", "#333333", "#dc2626", "#555555"];
   const numSegments = items.length;
   const segmentAngle = 360 / numSegments;
 
-  // Ses dosyalarını yükle (Tarayıcıda çalıştığından emin olmak için useEffect içinde)
+  // Ses dosyalarını yükle
   useEffect(() => {
     // Ses dosyalarının public/sounds klasöründe olduğunu varsayıyoruz
+    // Eğer dosyalar yoksa hata vermemesi için try-catch bloğu veya kontrol eklenebilir ama
+    // tarayıcılar genellikle dosya bulunamazsa sadece konsola 404 yazar, çökmez.
     spinAudioRef.current = new Audio("/sounds/spin.mp3");
     winAudioRef.current = new Audio("/sounds/win.mp3");
     
-    // Ses ayarları (İsteğe bağlı)
     if (spinAudioRef.current) {
-        spinAudioRef.current.loop = true; // Dönüş sesi sürekli çalsın
-        spinAudioRef.current.volume = 0.5; // Ses seviyesi
+        spinAudioRef.current.loop = true; 
+        spinAudioRef.current.volume = 0.5;
     }
     if (winAudioRef.current) {
         winAudioRef.current.volume = 0.8;
@@ -57,14 +59,17 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
     // Dönüş sesini başlat
     if (spinAudioRef.current) {
         spinAudioRef.current.currentTime = 0;
-        spinAudioRef.current.play().catch(e => console.log("Ses çalma hatası:", e));
+        spinAudioRef.current.play().catch(e => console.log("Ses çalma hatası (Dosya eksik olabilir):", e));
     }
 
     const randomIndex = Math.floor(Math.random() * numSegments);
-    const extraSpins = 5; // Her seferinde en az 5 tam tur dönsün
+    const extraSpins = 5; // Her seferinde en az 5 tam tur
     
     // Hedefin (Seçilen ödülün) merkez açısını hesapla
+    // Çarkın 0 derecesi (Saat 12 yönü) referans alınır.
     const segmentCenter = randomIndex * segmentAngle + segmentAngle / 2;
+    
+    // Hedefin göstergeye (Saat 12'ye) gelmesi için gereken açı: 360 - merkez
     const targetAngle = 360 - segmentCenter;
 
     // Mevcut toplam dönüş miktarını al
@@ -76,12 +81,12 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
     // Hedefe ulaşmak için gereken farkı hesapla
     let adjustment = targetAngle - normalizedRotation;
     
-    // Hep ileri gitmek istiyoruz
+    // Hep ileri gitmek istiyoruz, eğer fark negatifse bir tur ekle
     if (adjustment < 0) {
       adjustment += 360;
     }
     
-    // Yeni toplam açı
+    // Yeni toplam açı = Eski Açı + (Ekstra Turlar) + (Hedef Ayarı)
     const newTotalRotation = currentRotation + (360 * extraSpins) + adjustment;
 
     // Yeni değeri kaydet
@@ -91,11 +96,10 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
       rotate: newTotalRotation,
       transition: { 
         duration: 5, 
-        ease: [0.16, 1, 0.3, 1] 
+        ease: [0.16, 1, 0.3, 1] // Daha doğal bir yavaşlama eğrisi (Bezier)
       },
     });
 
-    // Dönüş bittiğinde
     setIsSpinning(false);
     
     // Dönüş sesini durdur
@@ -146,16 +150,17 @@ export default function GiftWheel({ items, onSpinEnd }: GiftWheelProps) {
                   transform: `rotate(${rotation}deg)`,
                 }}
               >
+                {/* Yazı Alanı - Eski Düzen (Yatay, kelime bazlı alt alta) */}
+                {/* pt-4 ile dış kenardan (yukarıdan) biraz boşluk bırakıyoruz */}
                 <div className="pt-4 sm:pt-8 h-1/2 flex flex-col justify-start items-center">
-                   <span
-                    className="text-white font-bold uppercase tracking-wider text-[10px] sm:text-xs md:text-sm drop-shadow-md text-center px-1"
-                    style={{
-                      writingMode: "vertical-rl",
-                      textOrientation: "mixed",
-                    }}
+                   <div
+                    className="text-white font-bold uppercase tracking-wider text-[9px] sm:text-[10px] md:text-xs drop-shadow-md text-center leading-tight w-[60px] sm:w-[80px]"
                   >
-                    {item}
-                  </span>
+                    {/* Kelimeleri boşluktan bölüp alt alta yazdırıyoruz */}
+                    {item.split(" ").map((word, i) => (
+                      <span key={i} className="block">{word}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             );
