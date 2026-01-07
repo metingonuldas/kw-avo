@@ -10,14 +10,14 @@ import { motion, AnimatePresence } from "framer-motion";
 // Hediye Listesi
 const PRIZES = [
   "YO Elinden Türk Kahvesi",
-  "Not Defteri ",
-  "Muharrem Ünaldılar ile bire bir",
-  "Kahve Fincanı",
-  "Takım Lideri Özel Hedef Oturumu",
-  "Post-it ve Fosforlu Kalem",
-  "Çelik Metre",
   "2 Adet Instagram Postu",
-  "El Feneri ",
+  "Ofis Malzemesi",
+  "KW Kupa Bardağı",
+  "Takım Lideri Özel Hedef Oturumu",
+  "Muharrem Ünaldılar ile bire bir",
+  "Ölçüm Malzemesi",
+  "Sosyal Medya Desteği",
+  "Saha Ekipmanı"
 ];
 
 export default function AppointmentGamePage() {
@@ -29,7 +29,7 @@ export default function AppointmentGamePage() {
     setShowModal(true);
 
     // Konfeti Patlat
-    if (result !== "Tebrikler! (Pas) 👏") {
+    if (result !== "YO Elinden Türk Kahvesi") {
       const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 50 };
