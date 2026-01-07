@@ -9,14 +9,15 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Hediye Listesi
 const PRIZES = [
-  "YO elinden kahve 🙂",
-  "İsme Özel Ajanda 📘",
-  "KW Tişörtü 👕",
-  "Sinema Bileti 🎬",
-  "Kitap Hediyesi 📚",
-  "Tebrikler! (Pas) 👏",
-  "10 Lead Desteği 📞",
-  "Instagram Postu 📸",
+  "YO Elinden Türk Kahvesi",
+  "Not Defteri ",
+  "Muharrem Ünaldılar ile 1 e 1",
+  "Kahve Fincanı",
+  "Takım Lideri Özel Hedef Oturumu",
+  "Post-it ve Fosforlu Kalem",
+  "Çelik Metre",
+  "2 Adet Instagram Postu",
+  "El Feneri ",
 ];
 
 export default function AppointmentGamePage() {
