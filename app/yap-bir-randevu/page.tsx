@@ -1,48 +1,43 @@
 "use client";
 
 import { useState } from "react";
-// Önizleme ortamında next/link hatasını önlemek için standart <a> etiketi kullanıyoruz.
-// Gerçek projede: import Link from "next/link";
-import GiftWheel from "@/components/GiftWheel";
+import GiftWheel, { PrizeItem } from "@/components/GiftWheel";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Hediye Listesi
-const PRIZES = [
-  "YO Elinden Türk Kahvesi",
-  "2 Adet Instagram Postu",
-  "Ofis Malzemesi",
-  "Kupa Bardak",
-  "Takım Lideri Özel Hedef Oturumu",
-  "Muharrem Ünaldılar ile bire bir",
-  "Ölçüm Malzemesi",
-  "Saha Ekipmanı",
-  "Emine Er ile bire bir"
+const PRIZES: PrizeItem[] = [
+  { name: "YO Elinden Türk Kahvesi", weight: 1 },
+  { name: "2 Adet Instagram Postu", weight: 1 },
+  { name: "Ofis Malzemesi", weight: 1 },
+  { name: "Sahibinden.com Doping", weight: 0.5 },
+  { name: "Kupa Bardak", weight: 1 },
+  { name: "Takım Lideri Özel Hedef Oturumu", weight: 1 },
+  { name: "Hepsiemlak Doping", weight: 0.5 },
+  { name: "Muharrem Ünaldılar ile bire bir", weight: 1 },
+  { name: "Ölçüm Malzemesi", weight: 1 },
+  { name: "Koçlarla İş Çarkı Çalışmasına Katılım Hakkı", weight: 0.5 }, 
+  { name: "Saha Ekipmanı", weight: 1 },
+  { name: "Emine Er ile bire bir", weight: 1 }
 ];
 
 export default function AppointmentGamePage() {
   const [winner, setWinner] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const handleSpinEnd = (result: string) => {
-    setWinner(result);
+  const handleSpinEnd = (resultName: string) => {
+    setWinner(resultName);
     setShowModal(true);
 
-    // Konfeti Patlat
-    if (result !== "YO Elinden Türk Kahvesi") {
+    if (resultName !== "YO Elinden Türk Kahvesi") {
       const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 50 };
-
       const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
       const interval: any = setInterval(function () {
         const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
-
+        if (timeLeft <= 0) return clearInterval(interval);
         const particleCount = 50 * (timeLeft / duration);
         confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
         confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
@@ -51,7 +46,7 @@ export default function AppointmentGamePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 overflow-hidden relative">
+    <main className="min-h-screen bg-gray-50 overflow-hidden relative flex items-center justify-center p-4">
       
       {/* Arka Plan Süslemeleri */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
@@ -59,22 +54,36 @@ export default function AppointmentGamePage() {
         <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-black/5 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="z-10 text-center max-w-2xl mx-auto mb-8 mt-12 md:mt-0">
-        <div className="inline-block px-4 py-1.5 rounded-full bg-red-100 text-[#ba0c2f] font-bold text-xs tracking-widest uppercase mb-4">
-          Motivasyon Zamanı
-        </div>
-        <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-4 tracking-tight">
-          YAP BİR <span className="text-[#ba0c2f]">RANDEVU!</span>
-        </h1>
-        <p className="text-lg text-gray-600">
-          Randevunu al, sisteme gir, çarkı çevir ve anında hediyeni kazan! 
-          <br className="hidden md:block"/> Bol şanslar Dileriz! 🚀
-        </p>
-      </div>
+      {/* ANA İÇERİK KAPSAYICISI - GRID YAPISI */}
+      {/* Mobilde tek sütun, Geniş ekranda (lg) 2 sütun */}
+      <div className="w-full max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center z-10">
+        
+        {/* SOL TARA: BAŞLIK VE METİN */}
+        <div className="text-center lg:text-left order-1 lg:order-1 flex flex-col justify-center items-center lg:items-start lg:pl-12">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-red-100 text-[#ba0c2f] font-bold text-xs tracking-widest uppercase mb-6">
+              Motivasyon Zamanı
+            </div>
+            
+            <h1 className="text-5xl lg:text-7xl font-black text-gray-900 mb-6 tracking-tight leading-tight">
+              YAP BİR <br/>
+              <span className="text-[#ba0c2f]">RANDEVU!</span>
+            </h1>
+            
+            <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              Randevunu al, sisteme gir, çarkı çevir ve anında hediyeni kazan!
+              <br className="mt-2"/> Bol şanslar Dileriz! 🚀
+            </p>
 
-      {/* Çark Alanı */}
-      <div className="z-10 w-full flex justify-center mb-12">
-        <GiftWheel items={PRIZES} onSpinEnd={handleSpinEnd} />
+             {/* Dekoratif bir ok veya çizgi eklenebilir (Opsiyonel) */}
+             <div className="hidden lg:block w-24 h-2 bg-[#ba0c2f] rounded-full mt-4"></div>
+        </div>
+
+        {/* SAĞ TARAF: ÇARK */}
+        <div className="flex justify-center items-center order-2 lg:order-2 w-full">
+            {/* Çark componenti kendi içinde max-width 700px'e kadar büyüyecek */}
+            <GiftWheel items={PRIZES} onSpinEnd={handleSpinEnd} />
+        </div>
+
       </div>
 
       {/* Sonuç Modalı */}
