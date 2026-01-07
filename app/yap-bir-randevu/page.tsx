@@ -12,7 +12,7 @@ const PRIZES = [
   "YO Elinden Türk Kahvesi",
   "2 Adet Instagram Postu",
   "Ofis Malzemesi",
-  "KW Kupa Bardağı",
+  "Kupa Bardak",
   "Takım Lideri Özel Hedef Oturumu",
   "Muharrem Ünaldılar ile bire bir",
   "Ölçüm Malzemesi",
