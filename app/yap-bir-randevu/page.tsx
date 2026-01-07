@@ -16,7 +16,6 @@ const PRIZES = [
   "Takım Lideri Özel Hedef Oturumu",
   "Muharrem Ünaldılar ile bire bir",
   "Ölçüm Malzemesi",
-  "Sosyal Medya Desteği",
   "Saha Ekipmanı"
 ];
 
