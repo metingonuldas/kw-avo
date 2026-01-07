@@ -16,7 +16,8 @@ const PRIZES = [
   "Takım Lideri Özel Hedef Oturumu",
   "Muharrem Ünaldılar ile bire bir",
   "Ölçüm Malzemesi",
-  "Saha Ekipmanı"
+  "Saha Ekipmanı",
+  "Emine Er ile bire bir"
 ];
 
 export default function AppointmentGamePage() {
