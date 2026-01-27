@@ -8,7 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from '@next/third-parties/google';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://kw-avo.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.kwavo.net"),
   title: {
     default: "KW Alesta • KW Viya • KW Orsa",
     template: "%s | KW Alesta Viya Orsa",
@@ -47,12 +47,12 @@ export default async function RootLayout({
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://kwavo.net/#organization",
+        "@id": "https://www.kwavo.net/#organization",
         "name": "KW Alesta • KW Viya • KW Orsa",
-        "url": "https://kwavo.net",
+        "url": "https://www.kwavo.net",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://kwavo.net/media/logos/kw-alestaviyaorsa.svg"
+          "url": "https://www.kwavo.net/media/logos/kw-alestaviyaorsa.svg"
         },
         "sameAs": [
           "https://www.instagram.com/kwalestaviyaorsa",
@@ -69,11 +69,11 @@ export default async function RootLayout({
       },
       {
         "@type": "WebSite",
-        "@id": "https://kwavo.net/#website",
-        "url": "https://kwavo.net",
+        "@id": "https://www.kwavo.net/#website",
+        "url": "https://www.kwavo.net",
         "name": "KWAVO",
         "description": "Girişimcinin geliştiği yer.",
-        "publisher": { "@id": "https://kwavo.net/#organization" },
+        "publisher": { "@id": "https://www.kwavo.net/#organization" },
         "inLanguage": "tr-TR"
       }
     ]

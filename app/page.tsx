@@ -7,7 +7,7 @@ import StatsSection from "@/components/StatsSection";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kwavo.net"),
+  metadataBase: new URL("https://www.kwavo.net"),
   title: {
     default: "KW Alesta Viya Orsa | Girişimcilerin Geliştiği Yer.",
     template: "%s | KWAVO",
