@@ -163,7 +163,7 @@ export default function Navbar() {
             href="https://kwavo.com.tr"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-[#ba0c2f] border-2 border-[#ba0c2f] hover:bg-[#ba0c2f] hover:text-white transition-all active:scale-95"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-brand border-2 border-brand hover:bg-brand hover:text-white transition-all active:scale-95"
           >
             İlanlar
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -269,7 +269,7 @@ export default function Navbar() {
                   href="https://kwavo.com.tr"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-2 border border-[#ba0c2f] text-[#ba0c2f] text-center font-bold hover:bg-[#ba0c2f] hover:text-white transition-colors"
+                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-2 border border-brand text-brand text-center font-bold hover:bg-brand hover:text-white transition-colors"
                 >
                   İlan Portalı
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

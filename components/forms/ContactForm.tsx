@@ -234,7 +234,7 @@ export default function ContactForm() {
       <div className="pt-2">
         <button
           disabled={submitting}
-          className="inline-flex w-full items-center justify-center rounded-2xl bg-[#ba0c2f] px-6 py-3 font-medium text-white transition-all hover:bg-[#a00a29] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
+          className="inline-flex w-full items-center justify-center rounded-xl bg-brand px-6 py-3 font-medium text-white transition-all hover:bg-brand-hover hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
         >
           {submitting ? (
             <>

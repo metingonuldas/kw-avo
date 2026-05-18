@@ -58,7 +58,7 @@ export default function ValuesIcons() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
               transition={{ duration: 0.35, delay: i * 0.04 }}
-              className="group rounded-2xl border border-black/10 bg-white p-5 hover:shadow-sm transition-shadow"
+              className="group rounded-2xl border border-black/10 bg-white p-5 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start gap-3">
                 <div className="shrink-0 rounded-xl ring-1 ring-black/10 bg-gray-50 p-2 group-hover:bg-black group-hover:text-white transition-colors">

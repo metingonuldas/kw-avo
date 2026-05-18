@@ -36,8 +36,8 @@ export default function ScarletCoachingPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
       {/* HERO */}
-      <section className="rounded-3xl border border-black/5 bg-white shadow-sm">
-        <div className="border-b border-black/5 bg-gray-50/60 px-4 py-4 sm:px-8 sm:py-5 rounded-t-3xl">
+      <section className="rounded-3xl border border-black/10 bg-white shadow-sm">
+        <div className="border-b border-black/10 bg-gray-50/60 px-4 py-4 sm:px-8 sm:py-5 rounded-t-3xl">
           <div className="flex items-center gap-3">
             <div className="relative h-9 w-9 overflow-hidden rounded-xl border border-black/10 bg-white">
               <Image
@@ -149,7 +149,7 @@ export default function ScarletCoachingPage() {
 
       {/* ÖZELLİK KARTLARI */}
       <section className="mt-10 grid gap-5 md:grid-cols-2">
-        <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
           <div className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700">
             <span
               className="h-1.5 w-1.5 rounded-full"
@@ -167,7 +167,7 @@ export default function ScarletCoachingPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
           <div className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700">
             <span
               className="h-1.5 w-1.5 rounded-full"
