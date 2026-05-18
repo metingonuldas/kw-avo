@@ -52,13 +52,13 @@ export default function Footer() {
 
   return (
     <motion.footer
-      className="mt-20 border-t border-neutral-200 bg-white"
+      className="mt-20 border-t border-black/10 bg-white"
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: "-50px" }}
       variants={containerVariants}
     >
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
         <div className="grid gap-10 md:grid-cols-12">
           {/* Logo + kısa metin */}
           <motion.div className="md:col-span-4" variants={fadeUp}>

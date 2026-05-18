@@ -38,7 +38,7 @@ export default function TechnologyPage() {
       {/* Özellik Kartları */}
       <section className="py-12 mt-12 border-t border-gray-100">
         <div className="text-center mb-12">
-           <h3 className="text-2xl font-bold text-gray-900">KW Ekosistemi</h3>
+           <h3 className="text-2xl font-semibold text-gray-900">KW Ekosistemi</h3>
            <p className="text-gray-500 mt-2">İşinizi büyütmek için ihtiyacınız olan tüm araçlar.</p>
         </div>
 
@@ -105,13 +105,13 @@ export default function TechnologyPage() {
 
       {/* CTA */}
       <section className="mb-14 mt-12">
-        <div className="rounded-3xl bg-gray-900 p-8 sm:p-12 text-center text-white relative overflow-hidden">
+        <div className="rounded-3xl bg-gray-900 p-8 sm:p-10 text-center text-white relative overflow-hidden">
           {/* Arka plan deseni */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#ba0c2f]/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
           
           <div className="relative z-10">
-            <h3 className="text-2xl sm:text-3xl font-bold mb-4">
+            <h3 className="text-2xl sm:text-3xl font-semibold mb-4">
               Teknolojiyle Üretimi Artırmak İster misiniz?
             </h3>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
@@ -121,13 +121,13 @@ export default function TechnologyPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/contact"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white px-8 py-4 text-base font-bold text-gray-900 hover:bg-gray-100 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
               >
                 Danışman Ol
               </Link>
               <Link
                 href="/about"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl px-8 py-4 text-base font-medium ring-1 ring-white/30 hover:bg-white/10 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-medium ring-1 ring-white/30 hover:bg-white/10 transition-colors"
               >
                 Hakkımızda
               </Link>

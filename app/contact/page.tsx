@@ -48,7 +48,7 @@ function ResourceItem({
     : { href };
 
   return (
-    <div className="rounded-2xl border border-black/10 p-4 hover:shadow-sm transition">
+    <div className="rounded-2xl border border-black/10 p-4 hover:shadow-md transition">
       <div className="flex items-start gap-3">
         <span className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100">
           {icon}
@@ -76,7 +76,7 @@ function OfficeCard({
   return (
     <Link
       href={href}
-      className="block rounded-2xl border border-black/10 p-4 hover:shadow-sm transition"
+      className="block rounded-2xl border border-black/10 p-4 hover:shadow-md transition"
     >
       <h3 className="font-medium">{name}</h3>
       <p className="mt-1 text-sm text-gray-600">{area}</p>

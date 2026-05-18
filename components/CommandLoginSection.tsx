@@ -25,9 +25,9 @@ export default function CommandLoginSection() {
         
         {/* Üst Etiket */}
         <div className="inline-flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
-           <div className="w-1.5 h-12 bg-[#ba0c2f]" /> {/* KW Kırmızı Çizgi */}
+           <div className="w-1.5 h-12 bg-brand" /> {/* KW Kırmızı Çizgi */}
            <div>
-             <span className="block text-xs font-bold tracking-[0.2em] text-[#ba0c2f] uppercase mb-1">
+             <span className="block text-xs font-bold tracking-[0.2em] text-brand uppercase mb-1">
                Teknoloji Ortağınız
              </span>
              <span className="block text-2xl md:text-3xl font-light tracking-wide text-white">
@@ -39,7 +39,7 @@ export default function CommandLoginSection() {
         {/* Başlık */}
         <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
           Gayrimenkulün Geleceğini <br/>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ba0c2f] to-red-400">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand to-red-400">
             Bugünden Yönetin
           </span>
         </h2>
@@ -56,7 +56,7 @@ export default function CommandLoginSection() {
             href="https://console.command.kw.com/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-8 py-4 bg-[#ba0c2f] hover:bg-[#a00a29] text-white text-lg font-bold rounded-xl transition-all hover:shadow-[0_0_30px_-5px_rgba(186,12,47,0.5)] active:scale-95 group/btn"
+            className="inline-flex items-center justify-center px-6 py-3 bg-brand hover:bg-brand-hover text-white text-base font-semibold rounded-xl transition-all hover:shadow-md active:scale-95 group/btn"
           >
             Command'e Giriş Yap
             <svg className="w-5 h-5 ml-2 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

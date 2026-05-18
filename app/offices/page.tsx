@@ -86,7 +86,7 @@ export default function OfficesPage() {
         {offices.map((o) => (
           <div
             key={o.slug}
-            className="rounded-2xl border border-black/10 bg-white p-5"
+            className="rounded-2xl border border-black/10 bg-white p-5 transition hover:shadow-md"
           >
             <h2 className="text-lg font-medium">{o.name}</h2>
 
