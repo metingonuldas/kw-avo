@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 const NEWS_ITEMS = [
   {
@@ -50,27 +49,35 @@ export default function MarqueeNews() {
   if (NEWS_ITEMS.length === 0) return null;
 
   return (
-    <div className="w-full bg-white border-y border-black/5"
-      style={{ maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)" }}
-    >
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 text-xs sm:text-sm text-gray-700">
-        <div className="relative overflow-hidden">
-          <motion.div
-            className="flex gap-6"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              x: {
-                duration: 25,
-                repeat: Infinity,
-                ease: "linear",
-              },
-            }}
-          >
-            <MarqueeTrack />
-            <MarqueeTrack />
-          </motion.div>
+    <>
+      <style jsx>{`
+        @keyframes marquee-scroll {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          animation: marquee-scroll 25s linear infinite;
+        }
+        .marquee-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+      <div
+        className="w-full bg-white border-y border-black/5"
+        style={{
+          maskImage:
+            "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+        }}
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 text-xs sm:text-sm text-gray-700">
+          <div className="relative overflow-hidden">
+            <div className="marquee-track flex gap-6 w-max">
+              <MarqueeTrack />
+              <MarqueeTrack />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
