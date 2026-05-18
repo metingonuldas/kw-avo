@@ -136,13 +136,6 @@ export default function MediaPage() {
           </ul>
 
           <div className="flex items-center gap-3 pt-2">
-            <a
-              href={`${base}/brand-guidelines.pdf`}
-              className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium ring-1 ring-black/10 hover:bg-gray-50"
-              target="_blank"
-            >
-              Marka Rehberi (PDF)
-            </a>
             <Link
               href="/contact"
               className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium ring-1 ring-black/10 hover:bg-gray-50"

@@ -1,8 +1,8 @@
-// components/MarqueeNews.tsx
+"use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 
-// Geçici / statik haber şeridi öğeleri
 const NEWS_ITEMS = [
   {
     label: "Girişimcilerin geliştiği yer...",
@@ -17,7 +17,7 @@ const NEWS_ITEMS = [
     href: "/offices",
   },
   {
-    label: "Yeni projeler yayında — İzmir’in geleceğini birlikte inşa ediyoruz.",
+    label: "Yeni projeler yayında — İzmir'in geleceğini birlikte inşa ediyoruz.",
     href: "/projects",
   },
   {
@@ -26,32 +26,49 @@ const NEWS_ITEMS = [
   },
 ];
 
+function MarqueeTrack() {
+  return (
+    <div className="flex gap-6 whitespace-nowrap">
+      {NEWS_ITEMS.map((item, i) => (
+        <Link
+          key={i}
+          href={item.href}
+          className="inline-flex items-center gap-2 hover:text-red-600 transition-colors"
+        >
+          <span className="inline-block rounded-full bg-red-600/10 text-red-700 px-2 py-0.5 text-[11px]">
+            Haberler
+          </span>
+          <span className="truncate">{item.label}</span>
+          <span className="opacity-40">{"//"}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export default function MarqueeNews() {
-  // Hiç item yoksa hiç göstermeyelim
   if (NEWS_ITEMS.length === 0) return null;
 
-  // Akışın kesilmemesi için iki kez tekrar edelim
-  const loop = [...NEWS_ITEMS, ...NEWS_ITEMS];
-
   return (
-    <div className="w-full bg-white border-y border-black/5 kw-marquee">
+    <div className="w-full bg-white border-y border-black/5"
+      style={{ maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)" }}
+    >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-2 text-xs sm:text-sm text-gray-700">
         <div className="relative overflow-hidden">
-          <div className="kw-marquee-track whitespace-nowrap flex gap-6">
-            {loop.map((item, i) => (
-              <Link
-                key={item.label + "-" + i}
-                href={item.href}
-                className="inline-flex items-center gap-2 hover:text-red-600"
-              >
-                <span className="inline-block rounded-full bg-red-600/10 text-red-700 px-2 py-0.5 text-[11px]">
-                  Haberler
-                </span>
-                <span className="truncate">{item.label}</span>
-                <span className="opacity-40">{"//"}</span>
-              </Link>
-            ))}
-          </div>
+          <motion.div
+            className="flex gap-6"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{
+              x: {
+                duration: 25,
+                repeat: Infinity,
+                ease: "linear",
+              },
+            }}
+          >
+            <MarqueeTrack />
+            <MarqueeTrack />
+          </motion.div>
         </div>
       </div>
     </div>

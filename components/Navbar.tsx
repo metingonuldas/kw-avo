@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, type Variants } from "framer-motion";
 
 /* Üstte duran linkler */
 const primaryLinks = [
@@ -39,7 +39,13 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileCorpOpen, setMobileCorpOpen] = useState(false);
   const [corpOpen, setCorpOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const corpMenuRef = useRef<HTMLLIElement>(null);
+
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 50);
+  });
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -64,18 +70,32 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/5 bg-white/80 backdrop-blur">
-      <nav className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Logo - Next/Link ve Next/Image kullanımı */}
+    <motion.header
+      className="sticky top-0 z-50 border-b border-black/5 backdrop-blur"
+      animate={{
+        backgroundColor: scrolled ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.8)",
+        boxShadow: scrolled ? "0 1px 12px rgba(0,0,0,0.08)" : "0 0px 0px rgba(0,0,0,0)",
+      }}
+      transition={{ duration: 0.3 }}
+    >
+      <nav className="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between transition-[height] duration-300"
+        style={{ height: scrolled ? "56px" : "64px" }}
+      >
+        {/* Logo */}
         <Link href="/" className="flex items-center">
-          <Image
-            src="/media/logos/kw-alestaviyaorsa.svg"
-            alt="KWAVO"
-            width={260}
-            height={80}
-            className="h-16 w-auto"
-            priority
-          />
+          <motion.div
+            animate={{ scale: scrolled ? 0.88 : 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Image
+              src="/media/logos/kw-alestaviyaorsa.svg"
+              alt="KWAVO"
+              width={260}
+              height={80}
+              className="h-16 w-auto"
+              priority
+            />
+          </motion.div>
         </Link>
 
         {/* Masaüstü menü */}
@@ -271,6 +291,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </motion.header>
   );
 }

@@ -14,10 +14,15 @@ export const metadata: Metadata = {
   },
   description:
     "KW Alesta • KW Viya • KW Orsa olarak İzmir’de eğitim, teknoloji ve güçlü danışman ekosistemiyle büyüyoruz.",
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "tr_TR",
     siteName: "KWAVO",
+    url: "/",
+    title: "KW Alesta Viya Orsa | Girişimcilerin Geliştiği Yer.",
+    description:
+      "KW Alesta • KW Viya • KW Orsa olarak İzmir’de eğitim, teknoloji ve güçlü danışman ekosistemiyle büyüyoruz.",
     images: [
       {
         url: "/og/default.png",

@@ -1,10 +1,24 @@
 // app/privacy/page.tsx
 import Link from "next/link";
 
-export const metadata = {
-  title: "Gizlilik Politikası | KW Alesta • KW Viya • KW Orsa",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Gizlilik Politikası",
   description:
     "KWAVO web sitesi ve iletişim formlarında işlenen kişisel verilere ilişkin bilgilendirme.",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: "Gizlilik Politikası | KW Alesta • KW Viya • KW Orsa",
+    description:
+      "Kişisel verilerin işlenmesine ilişkin aydınlatma metni.",
+    url: "/privacy",
+    images: [{ url: "/og?title=Gizlilik%20Politikas%C4%B1", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og?title=Gizlilik%20Politikas%C4%B1"],
+  },
 };
 
 export default function PrivacyPage() {
