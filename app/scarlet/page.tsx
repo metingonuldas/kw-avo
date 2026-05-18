@@ -1,4 +1,4 @@
-// app/scarlet-coaching/page.tsx
+// app/scarlet/page.tsx
 export const dynamic = "force-static";
 
 import Image from "next/image";
@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: "Scarlet Koçluk Takımı",
   description:
     "Keller Williams’ta tüm danışmanların yararlanabileceği kapsamlı Üretkenlik Koçluğu Programı: Scarlet Koçluk Takımı.",
-  alternates: { canonical: "/scarlet-coaching" },
+  alternates: { canonical: "/scarlet" },
   openGraph: {
     title: "Scarlet Koçluk Takımı | KW Alesta • KW Viya • KW Orsa",
     description:
       "Scarlet Koçluk Takımı ile odaklanmayı artıran, üretkenliği yükselten ve danışmanları hedeflerine ulaştıran güçlü bir yapı.",
-    url: "/scarlet-coaching",
+    url: "/scarlet",
     images: [
       {
         url: "/images/kw-hero-cover.png",

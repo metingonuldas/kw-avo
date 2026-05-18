@@ -98,8 +98,33 @@ function OfficeCard({
 }
 
 export default function ContactPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "İletişim | KW Alesta • KW Viya • KW Orsa",
+    description: "İzmir'de üç ofisimizle yanınızdayız.",
+    url: "https://www.kwavo.net/contact",
+    mainEntity: {
+      "@type": "Organization",
+      name: "KW Alesta • KW Viya • KW Orsa",
+      url: "https://www.kwavo.net",
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          contactType: "customer service",
+          areaServed: "TR",
+          availableLanguage: "Turkish",
+        },
+      ],
+    },
+  };
+
   return (
     <main className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <header className="max-w-2xl">
         <p className="text-xs font-medium tracking-wide text-gray-500">
           İLETİŞİM

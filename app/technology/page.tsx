@@ -4,8 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import TechnologyHero from "@/components/technology/TechnologyHero";
 import CommandLoginSection from "@/components/CommandLoginSection";
-// Yeni Gemini Bileşenini İçe Aktar
-import GeminiSection from "@/components/GeminiSection";
 
 import type { Metadata } from "next";
 
@@ -14,6 +12,17 @@ export const metadata: Metadata = {
   description:
     "KW Command, dijital pazarlama araçları ve iş ortaklıklarıyla danışmanlarımızın işini tek ekosistemde kolaylaştırıyoruz.",
   alternates: { canonical: "/technology" },
+  openGraph: {
+    title: "Teknoloji ve İş Ortaklıkları | KW Alesta • KW Viya • KW Orsa",
+    description:
+      "KW Command ekosistemi ile danışmanlarımızın veri temelli, ölçeklenebilir iş kurmasını sağlıyoruz.",
+    url: "/technology",
+    images: [{ url: "/og?title=Teknoloji", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og?title=Teknoloji"],
+  },
 };
 
 export default function TechnologyPage() {
@@ -26,12 +35,7 @@ export default function TechnologyPage() {
         <CommandLoginSection />
       </div>
 
-      {/* YENİ: Gemini Pro Bölümü */}
-      <div className="mt-16 md:mt-24">
-        <GeminiSection />
-      </div>
-
-      {/* Mevcut Özellik Kartları */}
+      {/* Özellik Kartları */}
       <section className="py-12 mt-12 border-t border-gray-100">
         <div className="text-center mb-12">
            <h3 className="text-2xl font-bold text-gray-900">KW Ekosistemi</h3>
@@ -112,7 +116,7 @@ export default function TechnologyPage() {
             </h3>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
               KWAVO’da danışmanlarımızı hem eğitim hem teknolojiyle destekliyoruz.
-              Command ve Gemini Pro ile veri temelli, ölçeklenebilir bir iş kurun.
+              Command ekosistemi ile veri temelli, ölçeklenebilir bir iş kurun.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link

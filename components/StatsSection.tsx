@@ -12,7 +12,7 @@ const stats = [
   {
     icon: "👥",
     value: "500+ Danışman",
-    label: "İzmir’de en geniş gayrimenkul danışmanı ağı",
+    label: "İzmir'de en geniş gayrimenkul danışmanı ağı",
   },
   {
     icon: "🎓",
@@ -26,54 +26,100 @@ const stats = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] as const },
+  },
+};
+
+const imageVariants = {
+  hidden: { opacity: 0, scale: 0.95, x: 40 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    x: 0,
+    transition: { duration: 0.7, ease: [0.25, 0.4, 0.25, 1] as const },
+  },
+};
+
 export default function StatsSection() {
   return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
       <div className="grid gap-10 md:grid-cols-2 items-center">
         {/* Sol metin + istatistikler */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={containerVariants}
+        >
+          <motion.h2
+            className="text-2xl sm:text-3xl font-semibold"
+            variants={itemVariants}
+          >
             Her Yıl Daha Güçlü Bir Organizasyon
-          </h2>
-          <p className="mt-3 text-sm text-gray-600">
-            KW Alesta, KW Viya ve KW Orsa olarak İzmir’de üç bölge müdürlüğü ve
-            500’ün üzerinde danışmanla; eğitim, teknoloji ve paylaşım kültürü
+          </motion.h2>
+          <motion.p className="mt-3 text-sm text-gray-600" variants={itemVariants}>
+            KW Alesta, KW Viya ve KW Orsa olarak İzmir&apos;de üç bölge müdürlüğü ve
+            500&apos;ün üzerinde danışmanla; eğitim, teknoloji ve paylaşım kültürü
             merkezli bir iş modeliyle büyümeye devam ediyoruz.
-          </p>
-          <p className="mt-2 text-sm text-gray-600">
+          </motion.p>
+          <motion.p className="mt-2 text-sm text-gray-600" variants={itemVariants}>
             Amacımız, danışmanlarımızın sürdürülebilir ve kârlı işler kurmasını
             sağlayan güçlü bir altyapı sunmak: model, sistem, eğitim ve
             operasyon desteği bir arada.
-          </p>
+          </motion.p>
 
           <ul className="mt-6 space-y-4">
-            {stats.map((s, i) => (
-              <li key={s.value} className="flex items-start gap-4">
-                <div className="text-2xl">{s.icon}</div>
+            {stats.map((s) => (
+              <motion.li
+                key={s.value}
+                className="flex items-start gap-4"
+                variants={itemVariants}
+                whileHover={{ x: 4, transition: { duration: 0.2 } }}
+              >
+                <motion.div
+                  className="text-2xl"
+                  whileHover={{ scale: 1.2, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                >
+                  {s.icon}
+                </motion.div>
                 <div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 6 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
-                    transition={{ duration: 0.4, delay: i * 0.05 }}
-                    className="text-lg font-semibold"
-                  >
-                    {s.value}
-                  </motion.div>
+                  <div className="text-lg font-semibold">{s.value}</div>
                   <div className="text-sm text-gray-600">{s.label}</div>
                 </div>
-              </li>
+              </motion.li>
             ))}
           </ul>
 
-        <p className="text-sm text-muted-foreground mt-2">
-          İstatistikler KWAVO organizasyonunun güncel durumunu yansıtmak amacıyla
-          periyodik olarak güncellenen yaklaşık değerlerdir.
-        </p>
-        </div>
+          <motion.p
+            className="text-sm text-muted-foreground mt-2"
+            variants={itemVariants}
+          >
+            İstatistikler KWAVO organizasyonunun güncel durumunu yansıtmak amacıyla
+            periyodik olarak güncellenen yaklaşık değerlerdir.
+          </motion.p>
+        </motion.div>
 
-        {/* Sağ görsel */}
-        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+        {/* Sağ görsel — slide in from right */}
+        <motion.div
+          className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={imageVariants}
+        >
           <Image
             src="/images/avo-stats.jpg"
             alt="KWAVO organizasyon yapısı"
@@ -82,7 +128,7 @@ export default function StatsSection() {
             className="object-cover"
             priority
           />
-        </div>
+        </motion.div>
       </div>
     </section>
   );

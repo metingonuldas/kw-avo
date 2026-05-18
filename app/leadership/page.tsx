@@ -42,8 +42,25 @@ export default async function LeadershipPage({
       ? leaders
       : leaders.filter((l) => l.offices?.includes(currentFilter));
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "KW Alesta • KW Viya • KW Orsa",
+    url: "https://www.kwavo.net",
+    member: filteredLeaders.map((l) => ({
+      "@type": "Person",
+      name: l.name,
+      jobTitle: l.title,
+      url: `https://www.kwavo.net/leadership`,
+    })),
+  };
+
   return (
     <main className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Lider Ekip</h1>

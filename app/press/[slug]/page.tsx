@@ -18,8 +18,9 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   return {
     title: meta.title,
     description: meta.summary,
-    openGraph: { title: meta.title, description: meta.summary, images: [og] },
-    twitter: { card: "summary_large_image", title: meta.title, description: meta.summary, images: [og] },
+    alternates: { canonical: `/press/${params.slug}` },
+    openGraph: { title: meta.title, description: meta.summary, url: `/press/${params.slug}`, images: [og] },
+    twitter: { card: "summary_large_image" as const, title: meta.title, description: meta.summary, images: [og] },
   };
 }
 

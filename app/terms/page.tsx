@@ -1,10 +1,23 @@
 // app/terms/page.tsx
 import Link from "next/link";
 
-export const metadata = {
-  title: "Kullanım Şartları | KW Alesta • KW Viya • KW Orsa",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kullanım Şartları",
   description:
     "KWAVO web sitesi ve dijital kanallarının kullanımına ilişkin genel şartlar.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "Kullanım Şartları | KW Alesta • KW Viya • KW Orsa",
+    description: "Web sitesi kullanımına ilişkin genel şartlar.",
+    url: "/terms",
+    images: [{ url: "/og?title=Kullan%C4%B1m%20%C5%9Eartlar%C4%B1", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og?title=Kullan%C4%B1m%20%C5%9Eartlar%C4%B1"],
+  },
 };
 
 export default function TermsPage() {

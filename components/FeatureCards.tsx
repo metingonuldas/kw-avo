@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const cards = [
   {
@@ -14,7 +15,7 @@ const cards = [
   {
     title: "Ortak Bir Misyon",
     desc:
-      "1983’ten beri girişimcilere daha büyük işler kurmaları için fırsatlar sunuyoruz.",
+      "1983'ten beri girişimcilere daha büyük işler kurmaları için fırsatlar sunuyoruz.",
     cta: { label: "Daha Fazla", href: "/about" },
     image: "/images/avo-hp-c2.png",
   },
@@ -27,30 +28,65 @@ const cards = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.12 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" as const },
+  },
+};
+
 export default function FeatureCards() {
   return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
-      <h2 className="text-2xl sm:text-3xl font-semibold">
+      <motion.h2
+        className="text-2xl sm:text-3xl font-semibold"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5 }}
+      >
         Biz, Kariyerleri ve İşleri Büyütüyoruz
-      </h2>
+      </motion.h2>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-3">
+      <motion.div
+        className="mt-6 grid gap-6 md:grid-cols-3"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+      >
         {cards.map((c) => (
-          <article
+          <motion.article
             key={c.title}
+            variants={cardVariants}
+            whileHover={{ y: -6, transition: { duration: 0.25 } }}
             className="group rounded-2xl border border-black/10 bg-white overflow-hidden"
           >
-            {/* Görsel */}
-            <div className="relative aspect-[16/9]">
-              <Image
-                src={c.image}
-                alt={c.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover"
-              />
-              {/* hover efekti */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+            {/* Image with zoom on hover */}
+            <div className="relative aspect-[16/9] overflow-hidden">
+              <motion.div
+                className="relative w-full h-full"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Image
+                  src={c.image}
+                  alt={c.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
+                />
+              </motion.div>
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
             </div>
 
             <div className="p-5">
@@ -62,14 +98,19 @@ export default function FeatureCards() {
                 className="mt-4 inline-flex items-center rounded-xl px-3 py-2 text-sm font-medium ring-1 ring-black/10 group-hover:bg-black group-hover:text-white transition-colors"
               >
                 {c.cta.label}
-                <span className="ml-2 transition-transform group-hover:translate-x-0.5">
+                <motion.span
+                  className="ml-2"
+                  initial={{ x: 0 }}
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
                   →
-                </span>
+                </motion.span>
               </Link>
             </div>
-          </article>
+          </motion.article>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

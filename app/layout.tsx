@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from '@next/third-parties/google';
@@ -91,7 +92,9 @@ export default async function RootLayout({
         {/* Navbar ve Footer bakım modunda gizlenir */}
         {!isMaintenance && <Navbar />}
 
-        <div className="flex-1">{children}</div>
+        <div className="flex-1">
+          <PageTransition>{children}</PageTransition>
+        </div>
 
         {!isMaintenance && <Footer />}
 

@@ -33,10 +33,41 @@ export const metadata: Metadata = {
 export const dynamic = "force-static";
 
 export default function OfficesPage() {
-  const offices = getAllOffices(); // filtre/arama yok, hepsini göster
+  const offices = getAllOffices();
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "KW Alesta • KW Viya • KW Orsa",
+    url: "https://www.kwavo.net",
+    department: offices.map((o) => ({
+      "@type": "RealEstateAgent",
+      name: o.name,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: o.address,
+        addressLocality: "İzmir",
+        addressCountry: "TR",
+      },
+      ...(o.phone ? { telephone: o.phone } : {}),
+      ...(o.location?.lat && o.location?.lng
+        ? {
+            geo: {
+              "@type": "GeoCoordinates",
+              latitude: o.location.lat,
+              longitude: o.location.lng,
+            },
+          }
+        : {}),
+    })),
+  };
 
   return (
     <main className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <header className="mb-6">
         <h1 className="text-2xl font-semibold">Ofislerimiz</h1>
         <p className="mt-2 text-sm text-gray-600">
