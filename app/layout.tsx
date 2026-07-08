@@ -47,22 +47,42 @@ export default async function RootLayout({
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Organization",
+        "@type": ["Organization", "RealEstateAgent"],
         "@id": "https://www.kwavo.net/#organization",
         "name": "KW Alesta • KW Viya • KW Orsa",
+        "alternateName": ["KWAVO", "Keller Williams İzmir", "KW Alesta Viya Orsa"],
+        "legalName": "BTA Gayrimenkul Ticaret Anonim Şirketi",
         "url": "https://www.kwavo.net",
         "logo": {
           "@type": "ImageObject",
           "url": "https://www.kwavo.net/media/logos/kw-alestaviyaorsa.svg"
         },
+        "description":
+          "İzmir'de üç bölge müdürlüğü (KW Alesta, KW Viya, KW Orsa) ve 500'ün üzerinde gayrimenkul danışmanıyla hizmet veren Keller Williams franchise organizasyonu. Eğitim, teknoloji ve paylaşım kültürüyle danışmanların üretimini büyütür.",
+        "areaServed": {
+          "@type": "City",
+          "name": "İzmir"
+        },
+        "knowsAbout": [
+          "gayrimenkul danışmanlığı",
+          "emlak alım satım",
+          "gayrimenkul kariyeri",
+          "emlak franchise",
+          "gayrimenkul eğitimi"
+        ],
+        "parentOrganization": {
+          "@type": "Organization",
+          "name": "Keller Williams Realty",
+          "url": "https://www.kw.com"
+        },
         "sameAs": [
           "https://www.instagram.com/kwalestaviyaorsa",
           "https://www.linkedin.com/company/kwalestaviyaorsa",
-          "https://www.facebook.com/kwalestaviyaorsa" // Varsa ekle veya kaldır
+          "https://www.facebook.com/kwizmir"
         ],
         "contactPoint": {
           "@type": "ContactPoint",
-          "telephone": "+90-232-000-0000", // BURAYI GÜNCELLE: Gerçek numaranı yaz
+          "telephone": "+90-232-461-2171",
           "contactType": "customer service",
           "areaServed": "TR",
           "availableLanguage": "Turkish"

@@ -35,31 +35,39 @@ export const dynamic = "force-static";
 export default function OfficesPage() {
   const offices = getAllOffices();
 
+  // Ofis verisinde "areas" sokak adresi parçalarını, "address" ilçeyi tutar
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "KW Alesta • KW Viya • KW Orsa",
-    url: "https://www.kwavo.net",
-    department: offices.map((o) => ({
-      "@type": "RealEstateAgent",
-      name: o.name,
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: o.address,
-        addressLocality: "İzmir",
-        addressCountry: "TR",
-      },
-      ...(o.phone ? { telephone: o.phone } : {}),
-      ...(o.location?.lat && o.location?.lng
-        ? {
-            geo: {
-              "@type": "GeoCoordinates",
-              latitude: o.location.lat,
-              longitude: o.location.lng,
-            },
-          }
-        : {}),
-    })),
+    "@graph": offices.map((o) => {
+      const district = o.address.split("/")[0]?.trim() || "İzmir";
+      return {
+        "@type": ["LocalBusiness", "RealEstateAgent"],
+        "@id": `https://www.kwavo.net/offices#${o.slug}`,
+        name: o.name,
+        url: "https://www.kwavo.net/offices",
+        parentOrganization: { "@id": "https://www.kwavo.net/#organization" },
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: o.areas.join(", "),
+          addressLocality: district,
+          addressRegion: "İzmir",
+          addressCountry: "TR",
+        },
+        ...(o.phone ? { telephone: o.phone.replace(/\s+/g, "") } : {}),
+        ...(o.location?.lat && o.location?.lng
+          ? {
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: o.location.lat,
+                longitude: o.location.lng,
+              },
+              hasMap: `https://www.google.com/maps?q=${o.location.lat},${o.location.lng}`,
+            }
+          : {}),
+        areaServed: { "@type": "City", name: "İzmir" },
+        priceRange: "$$",
+      };
+    }),
   };
 
   return (
