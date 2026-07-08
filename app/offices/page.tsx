@@ -65,6 +65,12 @@ export default function OfficesPage() {
             }
           : {}),
         areaServed: { "@type": "City", name: "İzmir" },
+        openingHoursSpecification: {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          opens: "09:00",
+          closes: "18:00",
+        },
         priceRange: "$$",
       };
     }),
