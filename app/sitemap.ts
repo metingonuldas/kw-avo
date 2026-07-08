@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const highPriority = ["projects", "offices", "contact", "technology"];
   
   // Standart öncelikli sayfalar
-  const normalPriority = ["about", "leadership", "culture-cards"];
+  const normalPriority = ["about", "leadership", "culture-cards", "scarlet"];
 
   // 1. Ana Sayfa (En Yüksek)
   const home: MetadataRoute.Sitemap = [{
