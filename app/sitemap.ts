@@ -5,7 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   // Sitelinks adayı olan yüksek öncelikli sayfalar
-  const highPriority = ["projects", "offices", "contact", "technology"];
+  const highPriority = ["danisman-ol", "projects", "offices", "contact", "technology"];
   
   // Standart öncelikli sayfalar
   const normalPriority = ["about", "leadership", "culture-cards", "scarlet"];

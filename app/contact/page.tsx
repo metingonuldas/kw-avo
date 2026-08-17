@@ -42,11 +42,6 @@ function ResourceItem({
   icon: React.ReactNode;
   external?: boolean;
 }) {
-  const Cmp = external ? "a" : Link;
-  const props = external
-    ? { href, target: "_blank", rel: "noopener noreferrer" }
-    : { href };
-
   return (
     <div className="rounded-2xl border border-black/10 p-4 hover:shadow-md transition">
       <div className="flex items-start gap-3">
@@ -54,9 +49,15 @@ function ResourceItem({
           {icon}
         </span>
         <div className="flex-1">
-          <Cmp {...(props as any)} className="font-medium hover:underline">
-            {title}
-          </Cmp>
+          {external ? (
+            <a href={href} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
+              {title}
+            </a>
+          ) : (
+            <Link href={href} className="font-medium hover:underline">
+              {title}
+            </Link>
+          )}
           <p className="mt-1 text-sm text-gray-600">{desc}</p>
         </div>
       </div>
@@ -153,7 +154,7 @@ export default function ContactPage() {
           <ResourceItem
             title="Danışman Ol"
             desc="KWAVO’da girişimcilik kültürü ve üretim odaklı koçlukla büyü."
-            href="/contact"
+            href="/danisman-ol"
             icon={
               <svg width="18" height="18" viewBox="0 0 24 24">
                 <path d="M12 14l9-5-9-5-9 5 9 5zm0 0v7" stroke="currentColor" strokeWidth="2" fill="none" />

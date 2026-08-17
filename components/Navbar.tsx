@@ -175,7 +175,7 @@ export default function Navbar() {
 
           {/* Danışman Ol (İç Link -> Link bileşeni) */}
           <Link
-            href="/contact"
+            href="/danisman-ol"
             className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium bg-black text-white hover:opacity-90 transition-opacity border-2 border-transparent"
           >
             Danışman Ol
@@ -280,7 +280,7 @@ export default function Navbar() {
                 </a>
                 
                 <Link
-                  href="/contact"
+                  href="/danisman-ol"
                   className="block rounded-lg px-3 py-2 bg-black text-white text-center font-medium hover:opacity-90"
                   onClick={() => setMobileOpen(false)}
                 >

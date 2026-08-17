@@ -129,6 +129,19 @@ export default function PrivacyPage() {
             bu sayfada yayımlanır.
           </p>
         </div>
+
+        <div>
+          <h2 className="font-semibold">8. Çerezler, Analitik ve Reklam Ölçümü</h2>
+          <p className="mt-1">
+            Tercihinize bağlı olarak Google Analytics, Google Ads ve Meta
+            teknolojileri; sayfa görüntüleme, form dönüşümü, kampanya parametreleri
+            ve reklam tıklama kimlikleri gibi verileri performans ölçümü amacıyla
+            işleyebilir. Zorunlu olmayan analitik ve pazarlama depolaması, çerez
+            tercih ekranındaki seçiminize göre etkinleştirilir. Reklam kaynakları,
+            başvurunun hangi kampanyadan geldiğini anlayabilmek amacıyla başvuru
+            kaydıyla ilişkilendirilebilir.
+          </p>
+        </div>
       </section>
     </main>
   );

@@ -7,6 +7,8 @@ import PageTransition from "@/components/PageTransition";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from '@next/third-parties/google';
+import Script from "next/script";
+import ConsentManager from "@/components/marketing/ConsentManager";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.kwavo.net"),
@@ -107,6 +109,9 @@ export default async function RootLayout({
         <meta name="color-scheme" content="light" />
         {/* Bakım modundayken indexlenmesin */}
         {isMaintenance && <meta name="robots" content="noindex, nofollow" />}
+        <Script id="kwavo-consent-default" strategy="beforeInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.gtag=window.gtag||gtag;gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`}
+        </Script>
       </head>
       <body className="flex min-h-screen flex-col bg-white text-black">
         {/* Navbar ve Footer bakım modunda gizlenir */}
@@ -127,9 +132,17 @@ export default async function RootLayout({
         <Analytics /> 
 
         {/* 3. Google Analytics 4 */}
-        <GoogleAnalytics gaId="G-ZYB6BQGKQ5" />
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-ZYB6BQGKQ5"} />
 
-        {/* 4. JSON-LD Schema (Google Sitelinks için Kritik) */}
+        {/* 4. Google Ads dönüşüm hedefi */}
+        <Script id="kwavo-google-ads-config" strategy="afterInteractive">
+          {`window.gtag&&window.gtag('config','${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-16783249031"}');`}
+        </Script>
+
+        {/* 5. Kullanıcı izni ve Meta Pixel */}
+        <ConsentManager />
+
+        {/* 6. JSON-LD Schema (Google Sitelinks için Kritik) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

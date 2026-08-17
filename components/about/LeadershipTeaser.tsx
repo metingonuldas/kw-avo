@@ -47,7 +47,7 @@ export default function LeadershipTeaser() {
               Liderlik
             </Link>
             <Link
-              href="/contact"
+              href="/danisman-ol"
               className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium ring-1 ring-black/10 hover:bg-gray-50"
             >
               Bizimle Çalış
