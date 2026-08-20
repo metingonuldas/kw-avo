@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "İletişim",
   description:
-    "KW Alesta (Bayraklı – Ege Perla), KW Viya (Çiğli) ve KW Orsa (Urla) ekiplerine ulaşın. Sorularınızı doğru ofise yönlendirelim.",
+    "KW Alesta (Bayraklı – Ege Perla), KW Viya (Çiğli) ve KW Orsa (Güzelbahçe) ekiplerine ulaşın. Sorularınızı doğru ofise yönlendirelim.",
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "İletişim | KW Alesta • KW Viya • KW Orsa",
@@ -164,7 +164,7 @@ export default function ContactPage() {
 
           <ResourceItem
             title="Ofislerimiz"
-            desc="Bayraklı (Ege Perla), Çiğli ve Urla lokasyonlarımız."
+            desc="Bayraklı (Ege Perla), Çiğli ve Güzelbahçe lokasyonlarımız."
             href="/offices"
             icon={
               <svg width="18" height="18" viewBox="0 0 24 24">
@@ -212,7 +212,7 @@ export default function ContactPage() {
               />
               <OfficeCard
                 name="KW Orsa"
-                area="Urla"
+                area="Güzelbahçe"
                 href="/offices#orsa"
               />
             </div>

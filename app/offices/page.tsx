@@ -8,12 +8,12 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Ofislerimiz",
   description:
-    "KW Alesta (Bayraklı – Ege Perla), KW Viya (Çiğli) ve KW Orsa (Urla) ofislerimizi keşfedin. İzmir’in her bölgesinde gayrimenkul danışmanlık hizmeti sunuyoruz.",
+    "KW Alesta (Bayraklı – Ege Perla), KW Viya (Çiğli) ve KW Orsa (Güzelbahçe) ofislerimizi keşfedin. İzmir’in her bölgesinde gayrimenkul danışmanlık hizmeti sunuyoruz.",
   alternates: { canonical: "/offices" },
   openGraph: {
     title: "Ofislerimiz | KW Alesta • KW Viya • KW Orsa",
     description:
-      "İzmir’de üç lokasyon: Bayraklı, Çiğli ve Urla. Doğru ekibe kolayca ulaşın.",
+      "İzmir’de üç lokasyon: Bayraklı, Çiğli ve Güzelbahçe. Doğru ekibe kolayca ulaşın.",
     url: "/offices",
     images: [
       {
@@ -86,7 +86,7 @@ export default function OfficesPage() {
         <h1 className="text-2xl font-semibold">Ofislerimiz</h1>
         <p className="mt-2 text-sm text-gray-600">
           İzmir’de üç lokasyonda hizmet veriyoruz: KW Alesta (Ege Perla), KW Viya
-          (Çiğli) ve KW Orsa (Urla).
+          (Çiğli) ve KW Orsa (Güzelbahçe).
         </p>
       </header>
 

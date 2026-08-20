@@ -11,7 +11,7 @@ const filters: { key: FilterKey; label: string }[] = [
   { key: "ALL", label: "Tümü" },
   { key: "Alesta", label: "Alesta (Bayraklı – Ege Perla)" },
   { key: "Viya", label: "Viya (Çiğli)" },
-  { key: "Orsa", label: "Orsa (Urla)" },
+  { key: "Orsa", label: "Orsa (Güzelbahçe)" },
 ];
 
 /** areas içinden Alesta/Viya/Orsa eşleşmesi (case-insensitive) */
@@ -62,7 +62,7 @@ export default function OfficesSection({ offices }: { offices: Office[] }) {
       <header className="max-w-3xl">
         <h1 className="text-3xl font-semibold">Ofisler</h1>
         <p className="mt-3 text-sm text-gray-600">
-          İzmir’de <b>Bayraklı (Alesta)</b>, <b>Çiğli (Viya)</b> ve <b>Urla (Orsa)</b>
+          İzmir’de <b>Bayraklı (Alesta)</b>, <b>Çiğli (Viya)</b> ve <b>Güzelbahçe (Orsa)</b>
           bölgelerinde hizmet veriyoruz. Haritadan konumu açabilir veya doğrudan randevu isteyebilirsiniz.
         </p>
       </header>

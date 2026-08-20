@@ -7,7 +7,7 @@ import { captureAttribution, trackAdvisorLead } from "@/lib/marketing";
 const OFFICES = [
   { value: "KW Alesta", label: "KW Alesta — Bayraklı / Ege Perla" },
   { value: "KW Viya", label: "KW Viya — Çiğli" },
-  { value: "KW Orsa", label: "KW Orsa — Urla" },
+  { value: "KW Orsa", label: "KW Orsa — Güzelbahçe" },
   { value: "Kararsızım", label: "Kararsızım — birlikte değerlendirelim" },
 ];
 

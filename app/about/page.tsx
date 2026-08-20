@@ -85,7 +85,7 @@ export default function AboutPage() {
                 name: "KW Orsa",
                 address: {
                   "@type": "PostalAddress",
-                  addressLocality: "Urla",
+                  addressLocality: "Güzelbahçe",
                   addressRegion: "İzmir",
                   addressCountry: "TR",
                 },
@@ -112,7 +112,7 @@ export default function AboutPage() {
               KWAVO, Keller Williams’ın girişimci kültürünü İzmir’e taşıyan üç
               bölge müdürlüğünden oluşur:{" "}
               <b>KW Alesta (Bayraklı – Ege Perla)</b>,{" "}
-              <b>KW Viya (Çiğli)</b> ve <b>KW Orsa (Urla)</b>. Amacımız; emlak
+              <b>KW Viya (Çiğli)</b> ve <b>KW Orsa (Güzelbahçe)</b>. Amacımız; emlak
               danışmanlığını <b>yüksek üretim, güçlü teknoloji ekosistemi</b> ve
               <b> sürdürülebilir iş ortaklıkları</b> ile dönüştürmektir.
             </p>

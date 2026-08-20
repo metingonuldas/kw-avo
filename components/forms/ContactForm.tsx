@@ -16,7 +16,7 @@ type Subject =
 const OFFICE_OPTIONS = [
   { value: "KW Alesta", label: "KW Alesta (Bayraklı - Ege Perla)" },
   { value: "KW Viya", label: "KW Viya (Çiğli)" },
-  { value: "KW Orsa", label: "KW Orsa (Urla)" },
+  { value: "KW Orsa", label: "KW Orsa (Güzelbahçe)" },
 ];
 
 export default function ContactForm() {
