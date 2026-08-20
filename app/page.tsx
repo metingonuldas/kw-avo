@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "tr_TR",
-    siteName: "KWAVO",
+    siteName: "KW Alesta Viya Orsa",
     url: "/",
     title: "KW Alesta Viya Orsa | Girişimcilerin Geliştiği Yer.",
     description:

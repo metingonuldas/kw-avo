@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
+    siteName: "KW Alesta Viya Orsa",
     url: "/",
     title: "KW Alesta • KW Viya • KW Orsa",
     description: "Girişimcinin geliştiği yer.",
@@ -94,7 +95,8 @@ export default async function RootLayout({
         "@type": "WebSite",
         "@id": "https://www.kwavo.net/#website",
         "url": "https://www.kwavo.net",
-        "name": "KWAVO",
+        "name": "KW Alesta Viya Orsa",
+        "alternateName": ["KWAVO", "kwavo.net"],
         "description": "Girişimcinin geliştiği yer.",
         "publisher": { "@id": "https://www.kwavo.net/#organization" },
         "inLanguage": "tr-TR"
