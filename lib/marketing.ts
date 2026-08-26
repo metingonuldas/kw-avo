@@ -121,7 +121,7 @@ export function trackSellerLead(eventId: string, propertyType: string, district:
   });
 
   const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-16783249031";
-  const conversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_SELLER_LEAD_LABEL;
+  const conversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_SELLER_LEAD_LABEL || "8WT-CIy-pegcEIed8MI-";
   if (adsId && conversionLabel) {
     window.gtag?.("event", "conversion", {
       send_to: `${adsId}/${conversionLabel}`,
