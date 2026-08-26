@@ -100,3 +100,43 @@ export function trackAdvisorLead(eventId: string, office: string) {
     { eventID: eventId },
   );
 }
+
+export function trackSellerLead(eventId: string, propertyType: string, district: string) {
+  if (typeof window === "undefined") return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: "seller_lead_submit_success",
+    event_id: eventId,
+    lead_type: "property_seller",
+    property_type: propertyType,
+    district,
+  });
+
+  window.gtag?.("event", "generate_lead", {
+    event_id: eventId,
+    lead_type: "property_seller",
+    property_type: propertyType,
+    district,
+  });
+
+  const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-16783249031";
+  const conversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_SELLER_LEAD_LABEL;
+  if (adsId && conversionLabel) {
+    window.gtag?.("event", "conversion", {
+      send_to: `${adsId}/${conversionLabel}`,
+      event_id: eventId,
+    });
+  }
+
+  window.fbq?.(
+    "track",
+    "Lead",
+    {
+      content_name: "Mülk Sahibi Talebi",
+      content_category: propertyType,
+      district,
+    },
+    { eventID: eventId },
+  );
+}
