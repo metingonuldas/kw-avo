@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Emlak danışmanlığı, gayrimenkul kariyeri, eğitim, teknoloji ve Keller Williams iş modeli hakkında güncel rehberler.",
   alternates: { canonical: "/blog", types: { "application/rss+xml": "/blog/rss.xml" } },
   openGraph: {
-    title: "Gayrimenkul ve Emlak Danışmanlığı Blogu",
+    title: "Gayrimenkul ve Emlak Danışmanlığı Blogu | KW Alesta Viya Orsa",
     description: "Gayrimenkul kariyerini bilgi, sistem ve teknolojiyle büyütmek isteyenler için rehberler.",
     url: "/blog",
     type: "website",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gayrimenkul ve Emlak Danışmanlığı Blogu",
+    title: "Gayrimenkul ve Emlak Danışmanlığı Blogu | KW Alesta Viya Orsa",
     description: "Gayrimenkul kariyerini bilgi, sistem ve teknolojiyle büyütmek isteyenler için rehberler.",
     images: ["/images/blog/gayrimenkul-danismanligi-size-uygun-mu.jpg"],
   },
