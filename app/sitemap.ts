@@ -1,14 +1,15 @@
 import { MetadataRoute } from "next";
 import { getAllProjects } from "@/lib/projects";
+import { getAllBlogPosts, getBlogCategories } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.kwavo.net").replace(/\/$/, "");
 
   // Sitelinks adayı olan yüksek öncelikli sayfalar
   const highPriority = ["evimi-satmak-istiyorum", "danisman-ol", "projects", "offices", "contact", "technology"];
   
   // Standart öncelikli sayfalar
-  const normalPriority = ["about", "leadership", "culture-cards", "scarlet"];
+  const normalPriority = ["about", "leadership", "culture-cards", "scarlet", "blog"];
 
   // 1. Ana Sayfa (En Yüksek)
   const home: MetadataRoute.Sitemap = [{
@@ -42,5 +43,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...home, ...highPages, ...normalPages, ...projectPages];
+  const blogPosts: MetadataRoute.Sitemap = getAllBlogPosts().map((post) => ({
+    url: `${base}/blog/${post.slug}`,
+    lastModified: new Date(post.updatedAt ?? post.date),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  const blogCategories: MetadataRoute.Sitemap = getBlogCategories().map((category) => ({
+    url: `${base}/blog/kategori/${category.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
+
+  return [...home, ...highPages, ...normalPages, ...projectPages, ...blogPosts, ...blogCategories];
 }

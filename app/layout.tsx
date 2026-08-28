@@ -27,13 +27,19 @@ export const metadata: Metadata = {
     description: "Girişimcinin geliştiği yer.",
     images: [
       {
-        url: "/og/og-default.png",
-        width: 1200,
-        height: 630,
+        url: "/og/default.png",
+        width: 1994,
+        height: 873,
+        alt: "KW Alesta Viya Orsa",
       },
     ],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "KW Alesta • KW Viya • KW Orsa",
+    description: "Girişimcinin geliştiği yer.",
+    images: ["/og/default.png"],
+  },
 };
 
 export default async function RootLayout({
@@ -53,7 +59,7 @@ export default async function RootLayout({
         "@type": ["Organization", "RealEstateAgent"],
         "@id": "https://www.kwavo.net/#organization",
         "name": "KW Alesta • KW Viya • KW Orsa",
-        "alternateName": ["KWAVO", "Keller Williams İzmir", "KW Alesta Viya Orsa"],
+        "alternateName": ["Keller Williams İzmir", "KW Alesta Viya Orsa"],
         "legalName": "BTA Gayrimenkul Ticaret Anonim Şirketi",
         "url": "https://www.kwavo.net",
         "logo": {
@@ -61,7 +67,7 @@ export default async function RootLayout({
           "url": "https://www.kwavo.net/media/logos/kw-alestaviyaorsa.svg"
         },
         "description":
-          "İzmir'de üç bölge müdürlüğü (KW Alesta, KW Viya, KW Orsa) ve 500'ün üzerinde gayrimenkul danışmanıyla hizmet veren Keller Williams franchise organizasyonu. Eğitim, teknoloji ve paylaşım kültürüyle danışmanların üretimini büyütür.",
+          "İzmir'de üç bölge müdürlüğüyle hizmet veren Keller Williams franchise organizasyonu. Eğitim, teknoloji ve paylaşım kültürüyle gayrimenkul danışmanlarının üretimini büyütür.",
         "areaServed": {
           "@type": "City",
           "name": "İzmir"
@@ -96,7 +102,7 @@ export default async function RootLayout({
         "@id": "https://www.kwavo.net/#website",
         "url": "https://www.kwavo.net",
         "name": "KW Alesta Viya Orsa",
-        "alternateName": ["KWAVO", "kwavo.net"],
+        "alternateName": ["Keller Williams İzmir", "kwavo.net"],
         "description": "Girişimcinin geliştiği yer.",
         "publisher": { "@id": "https://www.kwavo.net/#organization" },
         "inLanguage": "tr-TR"

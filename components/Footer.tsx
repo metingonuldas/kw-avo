@@ -19,6 +19,7 @@ const COLS = [
     links: [
       { label: "Ofisler", href: "/offices" },
       { label: "Projeler", href: "/projects" },
+      { label: "Blog", href: "/blog" },
       { label: "Basın", href: "/press" },
       { label: "İletişim", href: "/contact" },
     ],

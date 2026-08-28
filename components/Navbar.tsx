@@ -11,6 +11,7 @@ const primaryLinks = [
   { href: "/about", label: "Hakkımızda" },
   { href: "/offices", label: "Ofisler" },
   { href: "/technology", label: "Teknoloji" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "İletişim" },
 ];
 
@@ -89,7 +90,7 @@ export default function Navbar() {
           >
             <Image
               src="/media/logos/kw-alestaviyaorsa.svg"
-              alt="KWAVO"
+              alt="KW Alesta Viya Orsa"
               width={260}
               height={80}
               className="h-16 w-auto"
@@ -184,7 +185,7 @@ export default function Navbar() {
 
         {/* Mobil hamburger */}
         <button
-          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 ring-1 ring-black/10"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-lg ring-1 ring-black/10 md:hidden"
           onClick={() => {
             const next = !mobileOpen;
             setMobileOpen(next);
@@ -217,7 +218,7 @@ export default function Navbar() {
                   <Link
                     key={l.href}
                     href={l.href}
-                    className="block rounded-lg px-3 py-2 hover:bg-gray-50"
+                    className="flex min-h-11 items-center rounded-lg px-3 py-2 hover:bg-gray-50"
                     onClick={() => setMobileOpen(false)}
                   >
                     {l.label}
@@ -226,7 +227,7 @@ export default function Navbar() {
               </div>
 
               <button
-                className="mt-2 flex w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-50"
+                className="mt-2 flex min-h-11 w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-50"
                 onClick={() => setMobileCorpOpen((v) => !v)}
               >
                 <span>Kurumsal</span>
@@ -253,7 +254,7 @@ export default function Navbar() {
                         <Link
                           key={m.href}
                           href={m.href}
-                          className="block rounded-lg px-3 py-2 hover:bg-gray-50"
+                          className="flex min-h-11 items-center rounded-lg px-3 py-2 hover:bg-gray-50"
                           onClick={() => { setMobileOpen(false); setMobileCorpOpen(false); }}
                         >
                           {m.label}
@@ -269,7 +270,7 @@ export default function Navbar() {
                   href="https://kwavo.com.tr"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-lg px-3 py-2 border border-brand text-brand text-center font-bold hover:bg-brand hover:text-white transition-colors"
+                  className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand px-3 py-2 text-center font-bold text-brand transition-colors hover:bg-brand hover:text-white"
                 >
                   İlan Portalı
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -281,7 +282,7 @@ export default function Navbar() {
                 
                 <Link
                   href="/danisman-ol"
-                  className="block rounded-lg px-3 py-2 bg-black text-white text-center font-medium hover:opacity-90"
+                  className="flex min-h-11 items-center justify-center rounded-lg bg-black px-3 py-2 text-center font-medium text-white hover:opacity-90"
                   onClick={() => setMobileOpen(false)}
                 >
                   Danışman Ol
