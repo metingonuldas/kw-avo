@@ -39,7 +39,7 @@ export default function BlogCard({ post, priority = false }: { post: BlogPostMet
           <time dateTime={post.date} className="text-neutral-500">
             {new Date(post.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
           </time>
-          <Link href={`/blog/${post.slug}`} className="font-semibold text-brand" aria-label={`${post.title} yazısını oku`}>
+          <Link href={`/blog/${post.slug}`} className="font-semibold text-brand" aria-label={`Yazıyı oku: ${post.title}`}>
             Yazıyı oku <span aria-hidden>→</span>
           </Link>
         </div>

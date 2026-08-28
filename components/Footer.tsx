@@ -83,9 +83,9 @@ export default function Footer() {
           <div className="md:col-span-8 grid gap-8 sm:grid-cols-2">
             {COLS.map((col) => (
               <motion.nav key={col.title} variants={fadeUp}>
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
                   {col.title}
-                </h4>
+                </h2>
                 <ul className="mt-3 space-y-2 text-sm">
                   {col.links.map((l) => (
                     <li key={l.href}>
