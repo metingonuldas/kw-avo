@@ -212,10 +212,41 @@ const PROFILES: Record<StyleKey, {
 
 const STYLE_ORDER: StyleKey[] = ["D", "I", "S", "C"];
 
-function calculate(answers: StyleKey[]) {
+const BALANCED_ANSWER_ORDERS: StyleKey[][] = [
+  ["D", "I", "S", "C"],
+  ["I", "C", "D", "S"],
+  ["S", "D", "C", "I"],
+  ["C", "S", "I", "D"],
+  ["I", "D", "C", "S"],
+  ["S", "C", "D", "I"],
+  ["C", "I", "S", "D"],
+  ["D", "S", "I", "C"],
+  ["S", "I", "C", "D"],
+  ["C", "D", "I", "S"],
+  ["D", "C", "S", "I"],
+  ["I", "S", "D", "C"],
+];
+
+function shuffled<T>(values: readonly T[]) {
+  const result = [...values];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const target = Math.floor(Math.random() * (index + 1));
+    [result[index], result[target]] = [result[target], result[index]];
+  }
+  return result;
+}
+
+function createAnswerPlan() {
+  const tieOrder = shuffled(STYLE_ORDER);
+  const styleMap = Object.fromEntries(STYLE_ORDER.map((key, index) => [key, tieOrder[index]])) as Record<StyleKey, StyleKey>;
+  const orders = shuffled(BALANCED_ANSWER_ORDERS).map((order) => order.map((key) => styleMap[key]));
+  return { orders, tieOrder };
+}
+
+function calculate(answers: StyleKey[], tieOrder: StyleKey[]) {
   const scores = { D: 0, I: 0, S: 0, C: 0 } satisfies Record<StyleKey, number>;
   answers.forEach((answer) => { scores[answer] += 1; });
-  const ranked = [...STYLE_ORDER].sort((a, b) => scores[b] - scores[a] || STYLE_ORDER.indexOf(a) - STYLE_ORDER.indexOf(b));
+  const ranked = [...STYLE_ORDER].sort((a, b) => scores[b] - scores[a] || tieOrder.indexOf(a) - tieOrder.indexOf(b));
   const percentages = Object.fromEntries(STYLE_ORDER.map((key) => [key, Math.round((scores[key] / QUESTIONS.length) * 100)])) as Record<StyleKey, number>;
   return { scores, percentages, primary: ranked[0], secondary: ranked[1] };
 }
@@ -248,7 +279,8 @@ export default function CareerCompass() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState("");
-  const result = useMemo(() => calculate(answers), [answers]);
+  const [answerPlan, setAnswerPlan] = useState({ orders: BALANCED_ANSWER_ORDERS, tieOrder: STYLE_ORDER });
+  const result = useMemo(() => calculate(answers, answerPlan.tieOrder), [answers, answerPlan.tieOrder]);
 
   useEffect(() => { captureAttribution(); }, []);
 
@@ -321,6 +353,7 @@ export default function CareerCompass() {
         }),
       });
       if (!response.ok) throw new Error("request_failed");
+      setAnswerPlan(createAnswerPlan());
       setIntake(data);
       beginQuiz();
     } catch {
@@ -476,6 +509,11 @@ export default function CareerCompass() {
 
   if (phase === "quiz") {
     const question = QUESTIONS[current];
+    const orderedAnswers = answerPlan.orders[current].map((style) => {
+      const answer = question.answers.find((item) => item.style === style);
+      if (!answer) throw new Error(`Missing ${style} answer for question ${current + 1}`);
+      return answer;
+    });
     const progress = ((current + 1) / QUESTIONS.length) * 100;
     return (
       <main className="flex min-h-[calc(100vh-64px)] min-h-[calc(100dvh-64px)] items-start bg-[#f5f1eb] px-3 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:items-center sm:px-6 sm:py-10">
@@ -486,7 +524,7 @@ export default function CareerCompass() {
             <h1 className="max-w-3xl text-[1.35rem] font-black leading-tight sm:text-3xl">{question.prompt}</h1>
             <p className="mt-2 text-xs leading-5 text-neutral-500 sm:mt-3 sm:text-sm">Size en yakın olan seçeneği düşünmeden, doğal refleksinize göre işaretleyin.</p>
             <div className="mt-5 grid gap-2.5 sm:mt-7 sm:grid-cols-2 sm:gap-3">
-              {question.answers.map((answer) => (
+              {orderedAnswers.map((answer) => (
                 <button key={answer.style} onClick={() => choose(answer.style)} className={`group flex min-h-[72px] touch-manipulation items-center justify-between gap-3 rounded-2xl border p-4 text-left text-sm font-medium leading-5 transition active:scale-[0.99] sm:min-h-24 sm:gap-4 sm:p-5 sm:text-[15px] sm:leading-6 sm:hover:-translate-y-0.5 sm:hover:border-[#ba0c2f]/50 sm:hover:bg-[#fff8f9] ${answers[current] === answer.style ? "border-[#ba0c2f] bg-[#fff8f9]" : "border-black/10"}`}>
                   <span>{answer.text}</span><ChevronRight className="shrink-0 text-neutral-300 transition group-hover:translate-x-0.5 group-hover:text-[#ba0c2f]" size={20} />
                 </button>
