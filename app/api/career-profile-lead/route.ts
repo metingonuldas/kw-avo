@@ -1,12 +1,11 @@
-import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
 
-const OFFICES = ["KW Alesta", "KW Viya", "KW Orsa", "Kararsızım"];
-const EXPERIENCES = ["Deneyimim yok", "1 yıldan az", "1-3 yıl", "3 yıldan fazla"];
-const TIMES = ["En kısa sürede", "Hafta içi 09:00-12:00", "Hafta içi 12:00-17:00", "Hafta içi 17:00 sonrası"];
+const EDUCATION = ["Lise", "Ön lisans", "Lisans", "Yüksek lisans", "Doktora", "Diğer"];
+const GENDERS = ["Kadın", "Erkek", "Belirtmek istemiyorum", "Diğer"];
+const ENTREPRENEURSHIP = ["Evet", "Hayır"];
 const attempts = new Map<string, { count: number; resetAt: number }>();
 
 function clean(value: unknown, max = 300) {
@@ -39,26 +38,27 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const name = clean(body.name, 100);
+    if (body.website) return NextResponse.json({ ok: true });
+
+    const firstName = clean(body.first_name, 70);
+    const lastName = clean(body.last_name, 70);
     const email = clean(body.email, 180).toLowerCase();
     const phone = clean(body.phone, 30);
-    const office = clean(body.office, 40);
-    const experience = clean(body.experience, 40);
-    const preferredTime = clean(body.preferred_time, 60);
-    const note = clean(body.note, 800);
+    const birthDate = clean(body.birth_date, 10);
+    const occupation = clean(body.occupation, 100);
+    const city = clean(body.city, 70);
+    const district = clean(body.district, 70);
+    const education = clean(body.education, 40);
+    const gender = clean(body.gender, 40);
+    const entrepreneurship = clean(body.entrepreneurship, 10);
     const startedAt = Number(body.form_started_at || 0);
-    const eventId = clean(body.event_id, 80);
-    const profile = clean(body.profile, 4);
-    const secondaryProfile = clean(body.secondary_profile, 4);
-    const profileScores = body.profile_scores && typeof body.profile_scores === "object"
-      ? Object.entries(body.profile_scores).map(([key, value]) => `${clean(key, 2)}: %${Number(value) || 0}`).join(" · ")
-      : "";
 
-    if (body.website) return NextResponse.json({ ok: true });
-    if (!startedAt || Date.now() - startedAt < 2500) return NextResponse.json({ error: "invalid_submission" }, { status: 400 });
-    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "invalid_contact" }, { status: 400 });
+    if (!startedAt || Date.now() - startedAt < 1500) return NextResponse.json({ error: "invalid_submission" }, { status: 400 });
+    if (!firstName || !lastName || !occupation || !city || !district) return NextResponse.json({ error: "missing_fields" }, { status: 400 });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "invalid_email" }, { status: 400 });
     if (!/^[0-9+ ()-]{10,20}$/.test(phone)) return NextResponse.json({ error: "invalid_phone" }, { status: 400 });
-    if (!OFFICES.includes(office) || !EXPERIENCES.includes(experience) || !TIMES.includes(preferredTime)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return NextResponse.json({ error: "invalid_birth_date" }, { status: 400 });
+    if (!EDUCATION.includes(education) || !GENDERS.includes(gender) || !ENTREPRENEURSHIP.includes(entrepreneurship)) {
       return NextResponse.json({ error: "invalid_selection" }, { status: 400 });
     }
     if (!body.consent_terms) return NextResponse.json({ error: "consent_required" }, { status: 400 });
@@ -67,25 +67,23 @@ export async function POST(request: Request) {
     const campaignRows = [
       ["Kaynak", attribution.utm_source], ["Kanal", attribution.utm_medium],
       ["Kampanya", attribution.utm_campaign], ["İçerik", attribution.utm_content],
-      ["Anahtar Kelime", attribution.utm_term], ["GCLID", attribution.gclid],
-      ["FBCLID", attribution.fbclid], ["Açılış Sayfası", attribution.landing_page],
+      ["Anahtar Kelime", attribution.utm_term], ["Açılış Sayfası", attribution.landing_page],
       ["Yönlendiren", attribution.referrer],
     ].filter(([, value]) => value);
 
     const emailHtml = `
       <div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#18181b">
-        <div style="background:#ba0c2f;color:white;padding:22px;border-radius:12px 12px 0 0"><h1 style="margin:0;font-size:21px">Yeni Danışman Adayı</h1></div>
+        <div style="background:#1e1b1c;color:white;padding:22px;border-radius:12px 12px 0 0"><h1 style="margin:0;font-size:21px">Yeni Kariyer Pusulası Katılımcısı</h1></div>
         <div style="border:1px solid #e5e7eb;border-top:0;padding:24px;border-radius:0 0 12px 12px">
-          <p><strong>Ad Soyad:</strong> ${html(name)}</p><p><strong>Telefon:</strong> ${html(phone)}</p>
-          <p><strong>E-posta:</strong> ${html(email)}</p><p><strong>Ofis:</strong> ${html(office)}</p>
-          <p><strong>Deneyim:</strong> ${html(experience)}</p><p><strong>Uygun zaman:</strong> ${html(preferredTime)}</p>
-          <p><strong>Not:</strong> ${html(note || "—")}</p>
-          ${profile ? `<p><strong>Kariyer Pusulası:</strong> ${html(profile)} baskın · ${html(secondaryProfile)} destekleyici</p><p><strong>Profil dağılımı:</strong> ${html(profileScores)}</p>` : ""}
-          <p><strong>Pazarlama izni:</strong> ${body.consent_marketing ? "Evet" : "Hayır"}</p>
+          <p><strong>Ad Soyad:</strong> ${html(firstName)} ${html(lastName)}</p>
+          <p><strong>Telefon:</strong> ${html(phone)}</p><p><strong>E-posta:</strong> ${html(email)}</p>
+          <p><strong>Doğum tarihi:</strong> ${html(birthDate)}</p><p><strong>Meslek:</strong> ${html(occupation)}</p>
+          <p><strong>Konum:</strong> ${html(district)} / ${html(city)}</p>
+          <p><strong>Eğitim:</strong> ${html(education)}</p><p><strong>Cinsiyet:</strong> ${html(gender)}</p>
+          <p><strong>Daha önce girişimde bulundu mu?</strong> ${html(entrepreneurship)}</p>
           <hr style="border:0;border-top:1px solid #e5e7eb;margin:20px 0" />
           <h2 style="font-size:16px">Reklam kaynağı</h2>
           ${campaignRows.length ? campaignRows.map(([label, value]) => `<p><strong>${html(label)}:</strong> ${html(value)}</p>`).join("") : "<p>Doğrudan / kaynak bilgisi yok</p>"}
-          <p style="font-size:11px;color:#71717a">Event ID: ${html(eventId)} · Lead hash: ${createHash("sha256").update(email).digest("hex").slice(0, 12)}</p>
         </div>
       </div>`;
 
@@ -98,14 +96,14 @@ export async function POST(request: Request) {
       from: `KWAVO <${process.env.CONTACT_FROM || "iletisim@kwavo.net"}>`,
       to: recipients,
       replyTo: email,
-      subject: `Yeni Danışman Adayı: ${name} — ${office}${profile ? ` — Profil ${profile}` : ""}`,
+      subject: `Kariyer Pusulası Katılımcısı: ${firstName} ${lastName} — ${district}/${city}`,
       html: emailHtml,
     });
 
     if (result.error) throw new Error(result.error.message);
-    return NextResponse.json({ ok: true, event_id: eventId });
+    return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("Advisor lead error:", error);
+    console.error("Career profile lead error:", error);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }
