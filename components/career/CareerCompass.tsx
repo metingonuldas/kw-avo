@@ -4,16 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  BarChart3,
+  CalendarCheck,
   Check,
   ChevronRight,
   Compass,
-  Copy,
+  GraduationCap,
+  Laptop,
+  LockKeyhole,
   RefreshCcw,
-  Share2,
   ShieldCheck,
   Sparkles,
-  Target,
+  Users,
 } from "lucide-react";
 import { captureAttribution, trackAdvisorLead } from "@/lib/marketing";
 import CareerAssistant from "@/components/career/CareerAssistant";
@@ -163,6 +164,7 @@ const PROFILES: Record<StyleKey, {
   tagline: string;
   color: string;
   soft: string;
+  teaser: string;
   summary: string;
   strengths: string[];
   watch: string;
@@ -173,6 +175,7 @@ const PROFILES: Record<StyleKey, {
     tagline: "Harekete geçirir, sonucu sahiplenir",
     color: "#ba0c2f",
     soft: "#f9e9ed",
+    teaser: "Hedef netleştiğinde sorumluluk alma ve harekete geçme eğiliminiz güçlü görünüyor. Bu enerjinin doğru iş modeliyle birleşmesi önemli bir büyüme alanı yaratabilir.",
     summary: "Hız, cesaret ve netlik sizin doğal avantajınız. Gayrimenkulde hedef belirleme, müzakere ve fırsatı aksiyona dönüştürme alanlarında öne çıkabilirsiniz.",
     strengths: ["Hızlı karar", "Sonuç odağı", "Müzakere cesareti"],
     watch: "Hızınızın, bazı müşterilerin ihtiyaç duyduğu düşünme ve güven süresini gölgede bırakmamasına dikkat edin.",
@@ -183,6 +186,7 @@ const PROFILES: Record<StyleKey, {
     tagline: "İlişkileri fırsata, enerjiyi harekete dönüştürür",
     color: "#df6b22",
     soft: "#fff0e4",
+    teaser: "İnsanlarla bağ kurma ve çevrenizde hareket yaratma eğiliminiz öne çıkıyor. Bu gücü düzenli bir iş sistemiyle birleştirdiğinizde önemli bir büyüme alanı oluşabilir.",
     summary: "İletişim, görünürlük ve iyimserlik sizin doğal avantajınız. Gayrimenkulde çevre geliştirme, güven yaratma ve kişisel marka alanlarında öne çıkabilirsiniz.",
     strengths: ["Güçlü iletişim", "Çevre geliştirme", "İlham verme"],
     watch: "Yeni bağlantıların heyecanı içinde takip, kayıt ve süreç disiplinini ikinci plana atmamaya dikkat edin.",
@@ -193,6 +197,7 @@ const PROFILES: Record<StyleKey, {
     tagline: "Güven inşa eder, ilişkileri sürdürülebilir kılar",
     color: "#3f8069",
     soft: "#e7f3ef",
+    teaser: "Güven oluşturma ve ilişkileri uzun vadeli sürdürme eğiliminiz dikkat çekiyor. Bu yaklaşımın doğru üretim alışkanlıklarıyla birleşmesi güçlü bir müşteri ağı yaratabilir.",
     summary: "Sabır, sadakat ve dinleme gücü sizin doğal avantajınız. Gayrimenkulde uzun vadeli müşteri ilişkileri, referans ağı ve sakin problem çözmede öne çıkabilirsiniz.",
     strengths: ["Aktif dinleme", "Güven oluşturma", "İstikrar"],
     watch: "Uyumu korumak adına zor konuşmaları veya gerekli değişiklikleri gereğinden fazla ertelememeye dikkat edin.",
@@ -203,6 +208,7 @@ const PROFILES: Record<StyleKey, {
     tagline: "Veriyi içgörüye, sistemi güvene dönüştürür",
     color: "#465d78",
     soft: "#e9eef4",
+    teaser: "Hazırlık, analiz ve kalite yaklaşımınız belirgin görünüyor. Bu gücü sahadaki hız ve görünürlükle dengelediğinizde önemli bir uzmanlık avantajı yaratabilirsiniz.",
     summary: "Analiz, hazırlık ve kalite sizin doğal avantajınız. Gayrimenkulde doğru fiyatlama, bölge uzmanlığı ve hatasız süreç yönetiminde öne çıkabilirsiniz.",
     strengths: ["Analitik düşünme", "Planlama", "Kalite standardı"],
     watch: "Kusursuz bilgi arayışının karar almayı ve sahaya çıkmayı geciktirmemesine dikkat edin.",
@@ -251,28 +257,11 @@ function calculate(answers: StyleKey[], tieOrder: StyleKey[]) {
   return { scores, percentages, primary: ranked[0], secondary: ranked[1] };
 }
 
-function ResultBars({ percentages }: { percentages: Record<StyleKey, number> }) {
-  return (
-    <div className="space-y-3">
-      {STYLE_ORDER.map((key) => (
-        <div key={key} className="grid grid-cols-[72px_1fr_40px] items-center gap-2 text-xs sm:grid-cols-[88px_1fr_44px] sm:gap-3 sm:text-sm">
-          <span className="truncate font-semibold">{PROFILES[key].name}</span>
-          <div className="h-2.5 overflow-hidden rounded-full bg-black/8">
-            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${percentages[key]}%`, backgroundColor: PROFILES[key].color }} />
-          </div>
-          <span className="text-right font-bold tabular-nums">%{percentages[key]}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function CareerCompass() {
   const [phase, setPhase] = useState<"intro" | "intake" | "quiz" | "result">("intro");
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<StyleKey[]>([]);
   const [intake, setIntake] = useState<IntakeData | null>(null);
-  const [copied, setCopied] = useState(false);
   const [startedAt, setStartedAt] = useState(0);
   const [intakeSubmitting, setIntakeSubmitting] = useState(false);
   const [intakeError, setIntakeError] = useState("");
@@ -374,18 +363,6 @@ export default function CareerCompass() {
     }
   }
 
-  async function shareResult() {
-    const profile = PROFILES[result.primary];
-    const text = `KWAVO Kariyer Pusulası sonucum: ${profile.name} — ${profile.tagline}. Sen de çalışma stilini keşfet:`;
-    if (navigator.share) {
-      await navigator.share({ title: "KWAVO Kariyer Pusulası", text, url: window.location.href });
-      return;
-    }
-    await navigator.clipboard.writeText(`${text} ${window.location.href}`);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  }
-
   async function submitLead(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
@@ -436,13 +413,13 @@ export default function CareerCompass() {
               <Compass size={15} /> KWAVO Kariyer Pusulası
             </div>
             <h1 className="mt-6 max-w-3xl text-[2.6rem] font-black leading-[0.98] tracking-[-0.05em] sm:mt-7 sm:text-6xl lg:text-7xl">Gayrimenkulde nasıl bir iz bırakırsınız?</h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-neutral-600 sm:mt-6 sm:text-lg sm:leading-8">12 kısa senaryoda doğal çalışma stilinizi keşfedin. Sonuçta size özel güçlü yönler, gelişim ipuçları ve danışmanlık yol haritası alın.</p>
+            <p className="mt-5 max-w-xl text-base leading-7 text-neutral-600 sm:mt-6 sm:text-lg sm:leading-8">12 kısa senaryoda doğal çalışma stilinize dair ilk sinyalleri keşfedin. Test sonunda kısa ön değerlendirmenizi görün; ayrıntılı kariyer haritanızı uzmanımızla birlikte yorumlayın.</p>
             <button onClick={showIntake} className="mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-2xl bg-[#ba0c2f] px-6 py-4 font-bold text-white shadow-[0_16px_45px_rgba(186,12,47,0.28)] transition active:scale-[0.99] sm:mt-8 sm:w-auto sm:hover:-translate-y-0.5 sm:hover:bg-[#a00a29]">
               Ücretsiz testi başlat <ArrowRight size={19} />
             </button>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500">
               <span className="inline-flex items-center gap-2"><Sparkles size={16} /> Yaklaşık 3 dakika</span>
-              <span className="inline-flex items-center gap-2"><ShieldCheck size={16} /> Sonucu görmek için üyelik gerekmez</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck size={16} /> Üyelik ve ücret gerekmez</span>
             </div>
           </div>
           <div className="relative rounded-3xl border border-black/10 bg-[#1e1b1c] p-3 shadow-2xl sm:rounded-[2rem] sm:p-6">
@@ -541,68 +518,68 @@ export default function CareerCompass() {
   }
 
   const primary = PROFILES[result.primary];
-  const secondary = PROFILES[result.secondary];
   return (
     <main id="sonuc" tabIndex={-1} className="min-h-[calc(100vh-64px)] min-h-[calc(100dvh-64px)] bg-[#f5f1eb] px-3 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] outline-none sm:px-6 sm:py-10 lg:py-16">
-      <section className="mx-auto max-w-6xl">
-        <div className="grid overflow-hidden rounded-3xl border border-black/10 bg-white shadow-xl sm:rounded-[2rem] lg:grid-cols-[0.82fr_1.18fr]">
-          <div className="relative flex min-h-[310px] flex-col justify-between p-5 text-white sm:min-h-[390px] sm:p-10" style={{ backgroundColor: primary.color }}>
-            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full border-[42px] border-white/10" />
-            <div className="relative">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Baskın çalışma stiliniz</p>
-              <div className="mt-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white text-4xl font-black shadow-lg sm:mt-8 sm:h-24 sm:w-24 sm:rounded-3xl sm:text-5xl" style={{ color: primary.color }}>{result.primary}</div>
+      <section className="mx-auto max-w-5xl">
+        <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-xl sm:rounded-[2rem]">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="p-5 sm:p-10 lg:p-12">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><Check size={28} /></div>
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Ön değerlendirmeniz hazır</p>
+              <h1 className="mt-2 text-3xl font-black tracking-[-0.03em] sm:text-4xl">{intake?.first_name || "Tebrikler"}, çalışma stilinizde güçlü bir sinyal yakaladık.</h1>
+              <p className="mt-5 text-base leading-7 text-neutral-600">{primary.teaser}</p>
+              <div className="mt-6 rounded-2xl border border-[#ba0c2f]/15 bg-[#fff7f8] p-4 text-sm leading-6 text-neutral-700">
+                <Sparkles className="mr-2 inline text-[#ba0c2f]" size={18} />
+                Bu yalnızca ilk ipucu. Güçlü yönleriniz, gelişim alanlarınız ve size uygun iş planı detaylı değerlendirmede netleşecek.
+              </div>
+              <a href="#gorusme-formu" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-6 py-3.5 font-bold text-white shadow-[0_12px_32px_rgba(186,12,47,0.22)] transition active:scale-[0.99] sm:w-auto sm:hover:bg-[#a00a29]">Ücretsiz görüşme planla <ArrowRight size={18} /></a>
             </div>
-            <div className="relative mt-8 sm:mt-12">
-              <h1 className="text-4xl font-black tracking-[-0.04em] sm:text-5xl">{primary.name}</h1>
-              <p className="mt-3 max-w-sm text-lg leading-7 text-white/80">{primary.tagline}</p>
-              <p className="mt-5 text-sm text-white/65">Destekleyici stil: <strong className="text-white">{secondary.name} ({result.secondary})</strong></p>
+
+            <div className="relative min-h-[390px] overflow-hidden border-t border-black/8 bg-[#1e1b1c] p-5 text-white sm:p-10 lg:border-l lg:border-t-0">
+              <div aria-hidden="true" className="select-none space-y-5 opacity-55 blur-[7px]">
+                <div className="h-6 w-32 rounded-full bg-white/30" />
+                <div className="h-16 w-3/4 rounded-2xl bg-white/25" />
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="h-24 rounded-2xl bg-white/20" /><div className="h-24 rounded-2xl bg-white/20" /><div className="h-24 rounded-2xl bg-white/20" />
+                </div>
+                <div className="space-y-3 pt-3"><div className="h-3 w-full rounded-full bg-white/25" /><div className="h-3 w-5/6 rounded-full bg-white/25" /><div className="h-3 w-2/3 rounded-full bg-white/25" /></div>
+                <div className="grid grid-cols-2 gap-3 pt-2"><div className="h-20 rounded-2xl bg-white/15" /><div className="h-20 rounded-2xl bg-white/15" /></div>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#1e1b1c]/20 via-[#1e1b1c]/55 to-[#1e1b1c]/90 p-6 text-center">
+                <div className="max-w-xs">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/15 bg-white/10 backdrop-blur"><LockKeyhole size={28} /></div>
+                  <h2 className="mt-5 text-2xl font-black">Detaylı kariyer haritanız hazır</h2>
+                  <p className="mt-3 text-sm leading-6 text-white/65">Profil dağılımınız, güçlü yönleriniz ve gelişim önerileriniz uzman görüşmesinde birlikte açılacak.</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="p-5 sm:p-10">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Kariyer Pusulası sonucunuz</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">Doğal avantajınızı işe dönüştürün.</h2></div>
-              <button onClick={shareResult} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-black/10 px-4 py-2.5 text-sm font-semibold transition hover:bg-neutral-50 sm:w-auto">{copied ? <Copy size={17} /> : <Share2 size={17} />}{copied ? "Bağlantı kopyalandı" : "Sonucu paylaş"}</button>
-            </div>
-            <p className="mt-6 text-base leading-7 text-neutral-600">{primary.summary}</p>
-            <div className="mt-6 grid grid-cols-3 gap-2 sm:mt-7 sm:gap-4">
-              {primary.strengths.map((strength) => <div key={strength} className="rounded-xl p-3 sm:rounded-2xl sm:p-4" style={{ backgroundColor: primary.soft }}><Check size={18} style={{ color: primary.color }} /><p className="mt-2 text-xs font-bold leading-4 sm:text-sm">{strength}</p></div>)}
-            </div>
-            <div className="mt-8"><ResultBars percentages={result.percentages} /></div>
-          </div>
         </div>
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <article className="rounded-3xl border border-black/10 bg-white p-5 sm:rounded-[1.75rem] sm:p-8">
-            <div className="flex items-center gap-3"><div className="rounded-xl bg-amber-100 p-2.5 text-amber-700"><BarChart3 size={22} /></div><h2 className="text-xl font-black">Denge noktası</h2></div>
-            <p className="mt-4 leading-7 text-neutral-600">{primary.watch}</p>
-          </article>
-          <article className="rounded-3xl border border-black/10 bg-[#1e1b1c] p-5 text-white sm:rounded-[1.75rem] sm:p-8">
-            <div className="flex items-center gap-3"><div className="rounded-xl bg-white/10 p-2.5"><Target size={22} /></div><h2 className="text-xl font-black">İlk gelişim hamleniz</h2></div>
-            <p className="mt-4 leading-7 text-white/70">{primary.action}</p>
-          </article>
-        </div>
-
-        <CareerAssistant
-          firstName={intake?.first_name || "Merhaba"}
-          primary={result.primary}
-          secondary={result.secondary}
-          scores={result.percentages}
-        />
 
         <section className="mt-6 rounded-3xl border border-black/10 bg-white p-5 sm:rounded-[2rem] sm:p-9">
+          <div className="max-w-2xl"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Görüşmede sizi ne bekliyor?</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">Sonucu bir etiketten uygulanabilir bir plana dönüştürelim.</h2></div>
+          <div className="mt-7 grid gap-3 sm:grid-cols-3 sm:gap-4">
+            <article className="rounded-2xl bg-[#f5f1eb] p-5"><GraduationCap className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">Güçlü yönler ve gelişim alanları</h3><p className="mt-2 text-sm leading-6 text-neutral-600">Hangi doğal özelliklerinizi büyütebileceğinizi ve hangi alışkanlıkların sizi yavaşlatabileceğini konuşalım.</p></article>
+            <article className="rounded-2xl bg-[#f5f1eb] p-5"><Laptop className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">Size uygun araçlar</h3><p className="mt-2 text-sm leading-6 text-neutral-600">Eğitim, koçluk, KW Command CRM, teknoloji ve pazarlama desteğinin işinize nasıl uyarlanacağını gösterelim.</p></article>
+            <article className="rounded-2xl bg-[#f5f1eb] p-5"><Users className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">Kişisel başlangıç rotası</h3><p className="mt-2 text-sm leading-6 text-neutral-600">Deneyiminize ve hedeflerinize göre ilk adımları; liderlik desteği ve üç ofis ekosistemiyle birlikte planlayalım.</p></article>
+          </div>
+        </section>
+
+        <section id="gorusme-formu" className="mt-6 scroll-mt-20 rounded-3xl border border-black/10 bg-white p-5 sm:rounded-[2rem] sm:p-9">
           {!submitted ? (
             <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Sonraki adım</p>
-                <h2 className="mt-2 text-2xl font-black sm:text-3xl">Bu profil gayrimenkulde nasıl çalışır?</h2>
-                <p className="mt-4 leading-7 text-neutral-600">Sonucunuzu bir kariyer görüşmesinde birlikte yorumlayalım. Görüşme ücretsizdir; maaşlı iş başvurusu veya taahhüt değildir.</p>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f9e9ed] text-[#ba0c2f]"><CalendarCheck size={24} /></div>
+                <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Sonraki adım</p>
+                <h2 className="mt-2 text-2xl font-black sm:text-3xl">Kariyer haritanızı birlikte açalım.</h2>
+                <p className="mt-4 leading-7 text-neutral-600">Yaklaşık 20 dakikalık ücretsiz tanışma görüşmesinde sonucunuzu ve gayrimenkulde daha güçlü ilerlemek için kullanabileceğiniz araçları konuşalım. Görüşme bir iş teklifi veya taahhüt değildir.</p>
               </div>
               <form onSubmit={submitLead} className="grid gap-4 sm:grid-cols-2">
                 <label className="text-sm font-semibold">Görüşmek istediğiniz ofis<select name="office" defaultValue="Kararsızım" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>Kararsızım</option><option>KW Alesta</option><option>KW Viya</option><option>KW Orsa</option></select></label>
                 <label className="text-sm font-semibold">Gayrimenkul deneyimi<select name="experience" defaultValue="Deneyimim yok" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>Deneyimim yok</option><option>1 yıldan az</option><option>1-3 yıl</option><option>3 yıldan fazla</option></select></label>
                 <label className="text-sm font-semibold">Uygun zaman<select name="preferred_time" defaultValue="En kısa sürede" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>En kısa sürede</option><option>Hafta içi 09:00-12:00</option><option>Hafta içi 12:00-17:00</option><option>Hafta içi 17:00 sonrası</option></select></label>
                 <input name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px] h-px w-px" aria-hidden="true" />
-                <button disabled={submitting} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-5 py-3.5 font-bold text-white transition hover:bg-[#a00a29] disabled:opacity-60 sm:col-span-2">{submitting ? "Gönderiliyor…" : "Profilimi Bir Uzmanla Yorumla"}<ArrowRight size={18} /></button>
+                <button disabled={submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-5 py-3.5 font-bold text-white transition hover:bg-[#a00a29] disabled:opacity-60 sm:col-span-2">{submitting ? "Gönderiliyor…" : "Ücretsiz Görüşme Talep Et"}<ArrowRight size={18} /></button>
                 {formError && <p role="alert" className="text-sm text-red-700 sm:col-span-2">{formError}</p>}
               </form>
             </div>
@@ -610,6 +587,13 @@ export default function CareerCompass() {
             <div className="py-6 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><Check size={28} /></div><h2 className="mt-4 text-2xl font-black">Görüşme talebiniz alındı.</h2><p className="mt-2 text-neutral-600">Ekibimiz tercih ettiğiniz ofis ve zaman bilgisini dikkate alarak sizinle iletişim kuracak.</p></div>
           )}
         </section>
+
+        <CareerAssistant
+          firstName={intake?.first_name || ""}
+          primary={result.primary}
+          secondary={result.secondary}
+          scores={result.percentages}
+        />
 
         <div className="mt-7 flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
           <p className="max-w-3xl text-xs leading-5 text-neutral-500">Bu kısa çalışma, DISC davranış yaklaşımından ilham alan bir öz farkındalık deneyimidir. Psikometrik değerlendirme, klinik tanı veya işe alım eleme aracı değildir.</p>
