@@ -104,9 +104,12 @@ export async function POST(request: Request) {
 
     if (result.error) throw new Error(result.error.message);
 
-    // Portal aday panelinden yalnızca "Danışman Ol" formu beslenir; Kariyer
-    // Pusulası ve Danışman Pusulası gönderimleri yalnızca e-posta olarak gider.
-    if (!clean(body.source, 40) && process.env.PORTAL_LEAD_URL && process.env.PORTAL_LEAD_SECRET) {
+    // Portal aday panelinden "Danışman Ol" formu ve Kariyer Pusulası görüşme
+    // talepleri beslenir; Danışman Pusulası (mevcut danışmanlar için) hariç.
+    const source = clean(body.source, 40);
+    if (source !== "advisor_compass" && process.env.PORTAL_LEAD_URL && process.env.PORTAL_LEAD_SECRET) {
+      const sourceForm = source === "career_compass" ? "career_compass_meeting" : "advisor_form";
+      const hasProfile = body.profile || body.secondary_profile || body.profile_scores;
       try {
         const portalResponse = await fetch(process.env.PORTAL_LEAD_URL, {
           method: "POST",
@@ -120,6 +123,16 @@ export async function POST(request: Request) {
             note,
             consent_terms: true,
             consent_marketing: Boolean(body.consent_marketing),
+            source_form: sourceForm,
+            ...(hasProfile
+              ? {
+                  disc: {
+                    primary: profile,
+                    secondary: secondaryProfile,
+                    scores: body.profile_scores,
+                  },
+                }
+              : {}),
             attribution,
           }),
         });
