@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -270,8 +270,30 @@ export default function CareerCompass() {
   const [formError, setFormError] = useState("");
   const [answerPlan, setAnswerPlan] = useState({ orders: BALANCED_ANSWER_ORDERS, tieOrder: STYLE_ORDER });
   const result = useMemo(() => calculate(answers, answerPlan.tieOrder), [answers, answerPlan.tieOrder]);
+  const resultSentRef = useRef(false);
 
   useEffect(() => { captureAttribution(); }, []);
+
+  useEffect(() => {
+    if (phase !== "result" || resultSentRef.current) return;
+    resultSentRef.current = true;
+    fetch("/api/career-result", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: intake?.email || "",
+        phone: intake?.phone || "",
+        disc: {
+          primary: result.primary,
+          secondary: result.secondary,
+          scores: result.percentages,
+        },
+        attribution: captureAttribution(),
+      }),
+    }).catch(() => {
+      // Sonuç senkronizasyonu başarısız olsa da sonuç ekranı gösterilmeye devam eder.
+    });
+  }, [phase, intake, result]);
 
   useEffect(() => {
     const targets = {

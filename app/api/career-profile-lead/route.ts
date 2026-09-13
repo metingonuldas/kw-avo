@@ -101,6 +101,33 @@ export async function POST(request: Request) {
     });
 
     if (result.error) throw new Error(result.error.message);
+
+    // E-posta zaten gitti; portal senkronizasyonu başarısız olsa da ziyaretçinin
+    // gönderimi başarısız sayılmamalı.
+    if (process.env.PORTAL_LEAD_URL && process.env.PORTAL_LEAD_SECRET) {
+      try {
+        const portalResponse = await fetch(process.env.PORTAL_LEAD_URL, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-webhook-secret": process.env.PORTAL_LEAD_SECRET,
+          },
+          body: JSON.stringify({
+            source_form: "career_compass",
+            name: `${firstName} ${lastName}`.trim(),
+            email, phone,
+            occupation, city, district, education,
+            consent_terms: true,
+            attribution,
+          }),
+        });
+        if (!portalResponse.ok) {
+          console.error("Portal lead sync failed:", portalResponse.status);
+        }
+      } catch (portalError) {
+        console.error("Portal lead sync error:", portalError);
+      }
+    }
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Career profile lead error:", error);
