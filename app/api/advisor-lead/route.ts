@@ -103,6 +103,34 @@ export async function POST(request: Request) {
     });
 
     if (result.error) throw new Error(result.error.message);
+
+    // Portal aday panelinden yalnızca "Danışman Ol" formu beslenir; Kariyer
+    // Pusulası ve Danışman Pusulası gönderimleri yalnızca e-posta olarak gider.
+    if (!clean(body.source, 40) && process.env.PORTAL_LEAD_URL && process.env.PORTAL_LEAD_SECRET) {
+      try {
+        const portalResponse = await fetch(process.env.PORTAL_LEAD_URL, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-webhook-secret": process.env.PORTAL_LEAD_SECRET,
+          },
+          body: JSON.stringify({
+            name, email, phone, office, experience,
+            preferred_time: preferredTime,
+            note,
+            consent_terms: true,
+            consent_marketing: Boolean(body.consent_marketing),
+            attribution,
+          }),
+        });
+        if (!portalResponse.ok) {
+          // Aday e-postayla zaten iletildi; forma hata döndürmeye gerek yok.
+          console.error("Portal lead sync failed:", portalResponse.status);
+        }
+      } catch (portalError) {
+        console.error("Portal lead sync error:", portalError);
+      }
+    }
     return NextResponse.json({ ok: true, event_id: eventId });
   } catch (error) {
     console.error("Advisor lead error:", error);
