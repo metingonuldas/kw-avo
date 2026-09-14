@@ -26,12 +26,13 @@
     "next": "^16.0.7",
     "next-mdx-remote": "^6.0.0",
     "openai": "^6.9.1",
+    "postal-mime": "^3.0.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "resend": "^6.0.3"
+    "resend": "^6.28.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
