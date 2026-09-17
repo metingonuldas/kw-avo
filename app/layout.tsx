@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import PageTransition from "@/components/PageTransition";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from '@next/third-parties/google';
@@ -42,15 +38,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Cookie’lerden bakım modunu oku
-  const cookieStore = await cookies();
-  const isMaintenance = cookieStore.get("mw_maint")?.value === "1";
-
   // Gelişmiş Schema.org Yapısal Verisi (Organization + WebSite)
   const jsonLd = {
     "@context": "https://schema.org",
@@ -115,21 +107,13 @@ export default async function RootLayout({
       <head>
         {/* Her zaman açık tema */}
         <meta name="color-scheme" content="light" />
-        {/* Bakım modundayken indexlenmesin */}
-        {isMaintenance && <meta name="robots" content="noindex, nofollow" />}
         <Script id="kwavo-consent-default" strategy="beforeInteractive">
           {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.gtag=window.gtag||gtag;gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`}
         </Script>
       </head>
       <body className="flex min-h-screen flex-col bg-white text-black">
-        {/* Navbar ve Footer bakım modunda gizlenir */}
-        {!isMaintenance && <Navbar />}
-
-        <div className="flex-1">
-          <PageTransition>{children}</PageTransition>
-        </div>
-
-        {!isMaintenance && <Footer />}
+        {/* Navbar/Footer (site) route group düzeninde; bakım sayfası (bare) grubunda */}
+        {children}
 
         {/* --- ANALİTİK VE PERFORMANS ARAÇLARI --- */}
         

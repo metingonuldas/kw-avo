@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Bakım Modu | KWAVO",
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: false, noarchive: true },
 };
 
 export default function MaintenancePage() {
