@@ -10,24 +10,28 @@ export async function generateStaticParams() {
   return getAllPressSlugs().map(slug => ({ slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const { meta } = getPressBySlug(params.slug);
+type PageProps = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const { meta } = getPressBySlug(slug);
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const og = `${base}/og?title=${encodeURIComponent(meta.title)}`;
 
   return {
     title: meta.title,
     description: meta.summary,
-    alternates: { canonical: `/press/${params.slug}` },
-    openGraph: { title: meta.title, description: meta.summary, url: `/press/${params.slug}`, images: [og] },
+    alternates: { canonical: `/press/${slug}` },
+    openGraph: { title: meta.title, description: meta.summary, url: `/press/${slug}`, images: [og] },
     twitter: { card: "summary_large_image" as const, title: meta.title, description: meta.summary, images: [og] },
   };
 }
 
-export default function PressArticle({ params }: { params: { slug: string } }) {
+export default async function PressArticle({ params }: PageProps) {
+  const { slug } = await params;
   let meta, content;
   try {
-    ({ meta, content } = getPressBySlug(params.slug));
+    ({ meta, content } = getPressBySlug(slug));
   } catch {
     return notFound();
   }

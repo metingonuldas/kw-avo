@@ -1,5 +1,7 @@
 import { getAllBlogPosts } from "@/lib/blog";
 
+export const dynamic = "force-static";
+
 function escapeXml(value: string) {
   return value
     .replace(/&/g, "&amp;")

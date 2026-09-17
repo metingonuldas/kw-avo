@@ -46,8 +46,6 @@ export function middleware(req: NextRequest) {
       sameSite: "lax",
       httpOnly: false, // layout tarafından okunmayacak; sadece middleware kontrol ediyor
     });
-    // bakım görünüm çerezi reset
-    res.cookies.set("mw_maint", "0", { path: "/" });
     res.headers.set("Cache-Control", "no-store");
     return res;
   }
@@ -59,7 +57,6 @@ export function middleware(req: NextRequest) {
 
     const res = NextResponse.redirect(clean);
     res.cookies.delete("mw_bypass");
-    res.cookies.delete("mw_maint");
     res.headers.set("Cache-Control", "no-store");
     return res;
   }
@@ -68,15 +65,13 @@ export function middleware(req: NextRequest) {
   const hasBypass = req.cookies.get("mw_bypass")?.value === "1";
 
   // Bakım kapalıysa veya bypass varsa normal devam
+  // (Yanıta çerez eklenmez; sayfalar statik/önbellekli sunulabilsin)
   if (!MAINTENANCE_ON || hasBypass) {
-    const res = NextResponse.next();
-    res.cookies.set("mw_maint", "0", { path: "/" });
-    return res;
+    return NextResponse.next();
   }
 
-  // Bakım açık ve bypass yok → maintenance sayfasına rewrite + bakım çerezi 1
+  // Bakım açık ve bypass yok → maintenance sayfasına rewrite
   const res = NextResponse.rewrite(new URL("/maintenance", req.url));
-  res.cookies.set("mw_maint", "1", { path: "/" });
   res.headers.set("Cache-Control", "no-store");
   return res;
 }

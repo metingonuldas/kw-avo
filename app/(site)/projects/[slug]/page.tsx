@@ -4,10 +4,14 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import { getProjectBySlug, type Project } from "@/lib/projects";
+import { getAllProjects, getProjectBySlug, type Project } from "@/lib/projects";
 import GalleryGrid from "@/components/projects/GalleryGrid";
 
 type Params = { params: Promise<{ slug: string }> };
+
+export function generateStaticParams() {
+  return getAllProjects().map((p) => ({ slug: p.slug }));
+}
 
 // --- Metadata ---
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
