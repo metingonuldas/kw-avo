@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight, House } from "lucide-react";
+import styles from "./HeroSection.module.css";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -34,7 +36,7 @@ export default function HeroSection() {
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   return (
-    <section ref={sectionRef} className="relative h-[80vh] w-full overflow-hidden">
+    <section ref={sectionRef} className="relative h-[80svh] min-h-[540px] w-full overflow-hidden">
       {/* Parallax arka plan */}
       <motion.div className="absolute inset-0" style={{ y: imageY }}>
         <Image
@@ -81,17 +83,26 @@ export default function HeroSection() {
             yeniden tanımlıyoruz.
           </motion.p>
 
-          {/* CTA buttons staggered */}
-          <motion.div className="mt-6 flex flex-wrap justify-center gap-4" variants={fadeUp}>
+          <motion.div className="mt-8" variants={fadeUp}>
+            <Link href="/mulkumu-degerlendirmek-istiyorum" className={styles.sellerLink}>
+              <span className={styles.sellerIcon} aria-hidden="true"><House size={24} strokeWidth={1.8} /></span>
+              <span>Evimi Satmak veya Kiraya Vermek İstiyorum</span>
+              <ArrowUpRight className={styles.sellerArrow} size={22} aria-hidden="true" />
+            </Link>
+            <p className="mt-3 text-sm text-white/80">Ücretsiz görüşme · Taahhüt gerektirmez</p>
+          </motion.div>
+
+          {/* Secondary navigation */}
+          <motion.div className="mt-5 flex flex-wrap justify-center gap-3" variants={fadeUp}>
             <Link
               href="/about"
-              className="rounded-xl bg-red-600 px-5 py-3 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+              className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white hover:bg-white/15 transition-colors"
             >
               Hakkımızda
             </Link>
             <Link
               href="/contact"
-              className="rounded-xl bg-white/90 px-5 py-3 text-sm font-medium text-black hover:bg-white transition-colors"
+              className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white hover:bg-white/15 transition-colors"
             >
               İletişime Geç
             </Link>

@@ -4,14 +4,16 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
 import { captureAttribution, trackSellerLead } from "@/lib/marketing";
+import { PROPERTY_INTENT_LABELS, type PropertyIntent } from "@/lib/property-intent";
 
 const PROPERTY_TYPES = ["Daire", "Villa / Müstakil Ev", "Arsa / Tarla", "İşyeri / Ticari", "Diğer"];
 const SALE_TIMES = ["En kısa sürede", "1–3 ay içinde", "3–6 ay içinde", "Şimdilik araştırıyorum"];
 const CONTACT_TIMES = ["En kısa sürede", "09:00–12:00", "12:00–17:00", "17:00 sonrası"];
 
-export default function SellerLeadForm() {
+export default function SellerLeadForm({ allowRental = false }: { allowRental?: boolean }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [intent, setIntent] = useState<PropertyIntent | "">(allowRental ? "" : "sell");
   const [district, setDistrict] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [saleTime, setSaleTime] = useState("");
@@ -24,12 +26,13 @@ export default function SellerLeadForm() {
     setStartedAt(Date.now());
   }, []);
 
-  const firstStepReady = Boolean(district.trim() && propertyType && saleTime);
+  const firstStepReady = Boolean(intent && district.trim().length >= 2 && propertyType && saleTime);
   const fieldClass =
     "mt-1.5 block w-full rounded-xl border border-black/15 bg-white px-3.5 py-3 text-sm text-neutral-950 outline-none transition placeholder:text-neutral-400 focus:border-[#ba0c2f] focus:ring-4 focus:ring-[#ba0c2f]/10";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!intent || !firstStepReady || submitting) return;
     setSubmitting(true);
     setError("");
 
@@ -43,6 +46,7 @@ export default function SellerLeadForm() {
       district,
       property_type: propertyType,
       sale_time: saleTime,
+      property_intent: intent,
       consent_terms: form.get("consent_terms") === "on",
       website: String(form.get("website") || ""),
       form_started_at: startedAt,
@@ -62,8 +66,8 @@ export default function SellerLeadForm() {
         throw new Error(result.error || "request_failed");
       }
 
-      trackSellerLead(eventId, propertyType, district);
-      router.push("/evimi-satmak-istiyorum/tesekkurler");
+      trackSellerLead(eventId, propertyType, district, intent);
+      router.push(allowRental ? "/mulkumu-degerlendirmek-istiyorum/tesekkurler" : "/evimi-satmak-istiyorum/tesekkurler");
     } catch {
       setSubmitting(false);
       setError("Talebiniz şu anda gönderilemedi. Lütfen kısa bir süre sonra tekrar deneyin.");
@@ -71,7 +75,7 @@ export default function SellerLeadForm() {
   }
 
   return (
-    <form onSubmit={submit} aria-label="Gayrimenkul satış görüşmesi formu">
+    <form onSubmit={submit} aria-label={allowRental ? "Gayrimenkul satış veya kiraya verme görüşmesi formu" : "Gayrimenkul satış görüşmesi formu"}>
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Ücretsiz ön görüşme</p>
@@ -88,6 +92,19 @@ export default function SellerLeadForm() {
 
       {step === 1 ? (
         <div className="mt-6 space-y-4">
+          {allowRental && (
+            <fieldset>
+              <legend className="text-sm font-semibold text-neutral-800">Mülkünüz için ne düşünüyorsunuz?</legend>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {(["sell", "rent"] as const).map((value) => (
+                  <label key={value} className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm font-semibold transition ${intent === value ? "border-[#ba0c2f] bg-[#ba0c2f]/5 text-[#ba0c2f]" : "border-black/15 text-neutral-700 hover:bg-neutral-50"}`}>
+                    <input type="radio" name="property_intent" value={value} checked={intent === value} onChange={() => setIntent(value)} required className="accent-[#ba0c2f]" />
+                    {PROPERTY_INTENT_LABELS[value]}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )}
           <label className="block text-sm font-semibold text-neutral-800">
             Mülkün bulunduğu ilçe
             <input
@@ -109,7 +126,7 @@ export default function SellerLeadForm() {
           </label>
 
           <label className="block text-sm font-semibold text-neutral-800">
-            Ne zaman satmayı düşünüyorsunuz?
+            {intent === "rent" ? "Ne zaman kiraya vermeyi düşünüyorsunuz?" : intent === "sell" ? "Ne zaman satmayı düşünüyorsunuz?" : "Ne zaman ilerlemeyi düşünüyorsunuz?"}
             <select value={saleTime} onChange={(event) => setSaleTime(event.target.value)} required className={fieldClass}>
               <option value="" disabled>Seçin</option>
               {SALE_TIMES.map((item) => <option key={item}>{item}</option>)}
@@ -129,6 +146,7 @@ export default function SellerLeadForm() {
         <div className="mt-6 space-y-4">
           <div className="rounded-xl bg-neutral-50 p-3 text-xs leading-5 text-neutral-600">
             <strong className="text-neutral-900">{district}</strong> · {propertyType} · {saleTime}
+            {allowRental && intent && <span className="mt-1 block font-semibold text-[#ba0c2f]">{PROPERTY_INTENT_LABELS[intent]}</span>}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

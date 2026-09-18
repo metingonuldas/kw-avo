@@ -1,3 +1,5 @@
+import type { PropertyIntent } from "./property-intent";
+
 export type Attribution = {
   landing_page: string;
   referrer: string;
@@ -101,27 +103,32 @@ export function trackAdvisorLead(eventId: string, office: string) {
   );
 }
 
-export function trackSellerLead(eventId: string, propertyType: string, district: string) {
+export function trackSellerLead(eventId: string, propertyType: string, district: string, intent: PropertyIntent = "sell") {
   if (typeof window === "undefined") return;
+  const leadType = intent === "rent" ? "property_landlord" : "property_seller";
 
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
-    event: "seller_lead_submit_success",
+    event: intent === "rent" ? "landlord_lead_submit_success" : "seller_lead_submit_success",
     event_id: eventId,
-    lead_type: "property_seller",
+    lead_type: leadType,
+    property_intent: intent,
     property_type: propertyType,
     district,
   });
 
   window.gtag?.("event", "generate_lead", {
     event_id: eventId,
-    lead_type: "property_seller",
+    lead_type: leadType,
+    property_intent: intent,
     property_type: propertyType,
     district,
   });
 
   const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || "AW-16783249031";
-  const conversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_SELLER_LEAD_LABEL || "8WT-CIy-pegcEIed8MI-";
+  const conversionLabel = intent === "rent"
+    ? process.env.NEXT_PUBLIC_GOOGLE_ADS_LANDLORD_LEAD_LABEL
+    : process.env.NEXT_PUBLIC_GOOGLE_ADS_SELLER_LEAD_LABEL || "8WT-CIy-pegcEIed8MI-";
   if (adsId && conversionLabel) {
     window.gtag?.("event", "conversion", {
       send_to: `${adsId}/${conversionLabel}`,
@@ -133,7 +140,8 @@ export function trackSellerLead(eventId: string, propertyType: string, district:
     "track",
     "Lead",
     {
-      content_name: "Mülk Sahibi Talebi",
+      content_name: intent === "rent" ? "Kiraya Verme Talebi" : "Mülk Sahibi Talebi",
+      property_intent: intent,
       content_category: propertyType,
       district,
     },

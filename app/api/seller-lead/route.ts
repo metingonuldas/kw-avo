@@ -48,6 +48,12 @@ export async function POST(request: Request) {
     const preferredTime = clean(body.preferred_time, 60);
     const startedAt = Number(body.form_started_at || 0);
     const eventId = clean(body.event_id, 80);
+    // Existing sales forms without this field remain sales leads.
+    const intent = body.property_intent === undefined ? "sell" : body.property_intent;
+    if (intent !== "sell" && intent !== "rent") {
+      return NextResponse.json({ error: "invalid_selection" }, { status: 400 });
+    }
+    const intentLabel = intent === "rent" ? "Kiraya Verme" : "Satış";
 
     if (body.website) return NextResponse.json({ ok: true });
     if (!startedAt || Date.now() - startedAt < 2500) {
@@ -85,7 +91,7 @@ export async function POST(request: Request) {
       <div style="font-family:Arial,sans-serif;max-width:680px;margin:auto;color:#18181b">
         <div style="background:#ba0c2f;color:white;padding:22px;border-radius:12px 12px 0 0">
           <p style="margin:0 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:1.5px">Mülk Sahibi Lead'i</p>
-          <h1 style="margin:0;font-size:22px">Yeni Satış Görüşmesi Talebi</h1>
+          <h1 style="margin:0;font-size:22px">Yeni ${intentLabel} Görüşmesi Talebi</h1>
         </div>
         <div style="border:1px solid #e5e7eb;border-top:0;padding:24px;border-radius:0 0 12px 12px">
           <table style="width:100%;border-collapse:collapse">
@@ -94,7 +100,8 @@ export async function POST(request: Request) {
             <tr><td style="padding:8px 0;color:#71717a">E-posta</td><td style="padding:8px 0">${html(email || "—")}</td></tr>
             <tr><td style="padding:8px 0;color:#71717a">İlçe</td><td style="padding:8px 0;font-weight:bold">${html(district)}</td></tr>
             <tr><td style="padding:8px 0;color:#71717a">Mülk Türü</td><td style="padding:8px 0">${html(propertyType)}</td></tr>
-            <tr><td style="padding:8px 0;color:#71717a">Satış Zamanı</td><td style="padding:8px 0">${html(saleTime)}</td></tr>
+            <tr><td style="padding:8px 0;color:#71717a">İşlem Türü</td><td style="padding:8px 0;font-weight:bold">${intentLabel}</td></tr>
+            <tr><td style="padding:8px 0;color:#71717a">${intentLabel} Zamanı</td><td style="padding:8px 0">${html(saleTime)}</td></tr>
             <tr><td style="padding:8px 0;color:#71717a">Aranma Zamanı</td><td style="padding:8px 0">${html(preferredTime)}</td></tr>
           </table>
           <div style="margin-top:20px;padding:15px;background:#fff7ed;border-radius:10px;color:#9a3412">
@@ -119,7 +126,7 @@ export async function POST(request: Request) {
       from: `KWAVO <${process.env.CONTACT_FROM || "iletisim@kwavo.net"}>`,
       to: recipients,
       ...(email ? { replyTo: email } : {}),
-      subject: `Yeni Mülk Sahibi Talebi: ${name} — ${district} / ${propertyType}`,
+      subject: `Yeni ${intentLabel} Talebi: ${name} — ${district} / ${propertyType}`,
       html: emailHtml,
     });
 

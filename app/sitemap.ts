@@ -6,7 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.kwavo.net").replace(/\/$/, "");
 
   // Sitelinks adayı olan yüksek öncelikli sayfalar
-  const highPriority = ["evimi-satmak-istiyorum", "danisman-ol", "projects", "offices", "contact", "technology"];
+  const highPriority = ["evimi-satmak-istiyorum", "mulkumu-degerlendirmek-istiyorum", "danisman-ol", "projects", "offices", "contact", "technology"];
   
   // Standart öncelikli sayfalar
   const normalPriority = ["about", "leadership", "culture-cards", "scarlet", "blog"];

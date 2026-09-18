@@ -1,0 +1,85 @@
+.sellerLink {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 18px;
+  padding: 10px 22px 10px 12px;
+  background: linear-gradient(115deg, #a0082b, #d00d37 55%, #e62e50);
+  color: #fff;
+  box-shadow: 0 12px 36px rgb(186 12 47 / 40%), 0 0 0 5px rgb(255 255 255 / 6%), inset 0 1px 0 rgb(255 255 255 / 25%);
+  font-size: 18px;
+  font-weight: 700;
+  white-space: normal;
+  text-wrap: balance;
+  line-height: 1.4;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.sellerLink::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 25%, rgb(255 255 255 / 22%) 50%, transparent 75%);
+  transform: translateX(-150%);
+  animation: sellerShine 1.5s ease-in-out 1.6s 1;
+  pointer-events: none;
+}
+
+.sellerIcon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 12%);
+}
+
+.sellerArrow {
+  flex-shrink: 0;
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) {
+  .sellerLink:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 44px rgb(186 12 47 / 55%), 0 0 0 5px rgb(255 255 255 / 10%), inset 0 1px 0 rgb(255 255 255 / 25%);
+  }
+
+  .sellerLink:hover .sellerArrow {
+    transform: translate(2px, -2px);
+  }
+}
+
+.sellerLink:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 6px;
+}
+
+.sellerLink:active {
+  transform: translateY(0);
+}
+
+@keyframes sellerShine {
+  to { transform: translateX(150%); }
+}
+
+@media (width < 640px) {
+  .sellerLink { min-height: 60px; gap: 10px; padding: 10px 14px 10px 10px; font-size: 15px; }
+  .sellerIcon { width: 36px; height: 36px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sellerLink, .sellerArrow { transition: none; }
+  .sellerLink::after { animation: none; }
+  .sellerLink:hover, .sellerLink:hover .sellerArrow { transform: none; }
+}
