@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Compass } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, type Variants } from "framer-motion";
 
@@ -79,11 +80,11 @@ export default function Navbar() {
       }}
       transition={{ duration: 0.3 }}
     >
-      <nav className="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between transition-[height] duration-300"
+      <nav className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 transition-[height] duration-300 sm:px-6"
         style={{ height: scrolled ? "56px" : "64px" }}
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex shrink-0 items-center">
           <motion.div
             animate={{ scale: scrolled ? 0.88 : 1 }}
             transition={{ duration: 0.3 }}
@@ -93,14 +94,14 @@ export default function Navbar() {
               alt="KW Alesta Viya Orsa"
               width={260}
               height={80}
-              className="h-16 w-auto"
+              className="h-14 w-auto xl:h-12 2xl:h-16"
               priority
             />
           </motion.div>
         </Link>
 
         {/* Masaüstü menü */}
-        <ul className="hidden md:flex items-center gap-6 text-sm">
+        <ul className="hidden items-center gap-1 whitespace-nowrap text-sm xl:flex 2xl:gap-3">
           {primaryLinks.map((l) => (
             <li key={l.href}>
               <Link
@@ -158,7 +159,7 @@ export default function Navbar() {
         </ul>
 
         {/* Sağ Butonlar */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden shrink-0 items-center gap-2 whitespace-nowrap xl:flex">
           {/* İlan Portalı (Dış Link -> a etiketi kalır, target="_blank" olduğu için Link kullanılmaz) */}
           <a
             href="https://kwavo.com.tr"
@@ -174,18 +175,26 @@ export default function Navbar() {
             </svg>
           </a>
 
-          {/* Danışman Ol (İç Link -> Link bileşeni) */}
-          <Link
-            href="/danisman-ol"
-            className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium bg-black text-white hover:opacity-90 transition-opacity border-2 border-transparent"
-          >
-            Danışman Ol
-          </Link>
+          <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-neutral-100/80 p-1">
+            <Link
+              href="/kariyer-pusulasi"
+              aria-label="Benden Emlakçı Olur Mu? Kariyer Testi"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold text-[#ba0c2f] transition hover:bg-white hover:shadow-sm"
+            >
+              <Compass size={16} aria-hidden="true" /> Kariyer Testi
+            </Link>
+            <Link
+              href="/danisman-ol"
+              className="inline-flex items-center rounded-lg bg-black px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-85"
+            >
+              Danışman Ol
+            </Link>
+          </div>
         </div>
 
         {/* Mobil hamburger */}
         <button
-          className="inline-flex h-11 w-11 items-center justify-center rounded-lg ring-1 ring-black/10 md:hidden"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ring-1 ring-black/10 xl:hidden"
           onClick={() => {
             const next = !mobileOpen;
             setMobileOpen(next);
@@ -210,7 +219,7 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="md:hidden border-t border-black/5 bg-white overflow-hidden"
+            className="max-h-[calc(100dvh-64px)] overflow-y-auto border-t border-black/5 bg-white xl:hidden"
           >
             <div className="mx-auto max-w-6xl px-4 py-3 text-sm">
               <div className="space-y-1">

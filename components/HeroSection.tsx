@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, House } from "lucide-react";
+import { ArrowUpRight, Compass, House, UserRoundPlus } from "lucide-react";
 import styles from "./HeroSection.module.css";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
@@ -36,7 +36,7 @@ export default function HeroSection() {
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   return (
-    <section ref={sectionRef} className="relative h-[80svh] min-h-[540px] w-full overflow-hidden">
+    <section ref={sectionRef} className="relative h-[82svh] min-h-[610px] w-full overflow-hidden sm:h-[80svh] sm:min-h-[540px]">
       {/* Parallax arka plan */}
       <motion.div className="absolute inset-0" style={{ y: imageY }}>
         <Image
@@ -92,21 +92,26 @@ export default function HeroSection() {
             <p className="mt-3 text-sm text-white/80">Ücretsiz görüşme · Taahhüt gerektirmez</p>
           </motion.div>
 
-          {/* Secondary navigation */}
-          <motion.div className="mt-5 flex flex-wrap justify-center gap-3" variants={fadeUp}>
-            <Link
-              href="/about"
-              className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white hover:bg-white/15 transition-colors"
-            >
-              Hakkımızda
+          {/* Career actions */}
+          <motion.div className={styles.careerActions} variants={fadeUp}>
+            <Link href="/danisman-ol" className={styles.careerAction}>
+              <span className={styles.careerActionIcon} aria-hidden="true"><UserRoundPlus size={21} /></span>
+              <span className={styles.careerActionCopy}>
+                <strong>Danışman Ol</strong>
+                <small>Kariyerini başlat</small>
+              </span>
+              <ArrowUpRight className={styles.careerActionArrow} size={16} aria-hidden="true" />
             </Link>
-            <Link
-              href="/contact"
-              className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white hover:bg-white/15 transition-colors"
-            >
-              İletişime Geç
+            <Link href="/kariyer-pusulasi" className={styles.careerAction}>
+              <span className={styles.careerActionIcon} aria-hidden="true"><Compass size={21} /></span>
+              <span className={styles.careerActionCopy}>
+                <strong>Benden Emlakçı Olur Mu?</strong>
+                <small>2 dakikada keşfet</small>
+              </span>
+              <ArrowUpRight className={styles.careerActionArrow} size={16} aria-hidden="true" />
             </Link>
           </motion.div>
+
         </motion.div>
       </motion.div>
     </section>
