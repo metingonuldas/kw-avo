@@ -13,7 +13,12 @@ export const metadata: Metadata = {
     title,
     description,
     url: "/mulkumu-degerlendirmek-istiyorum",
-    images: [{ url: `/og?title=${encodeURIComponent(title)}`, width: 1200, height: 630 }],
+    images: [{
+      url: "/images/ads/openai-ev-sahibi-v1.png",
+      width: 1536,
+      height: 1024,
+      alt: "İzmir'de bir mülk sahibi ile gayrimenkul danışmanının değerlendirme görüşmesi",
+    }],
   },
 };
 
