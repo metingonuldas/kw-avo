@@ -8,7 +8,7 @@ type LeadConversion = {
   sourceUrl: string;
   oppref?: string;
   browserReference?: string;
-  email: string;
+  email?: string;
   phone: string;
   ipAddress?: string;
   userAgent?: string;
@@ -42,10 +42,10 @@ export async function sendOpenAiLeadConversion(conversion: LeadConversion) {
     || process.env.NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID
     || DEFAULT_PIXEL_ID;
   const phone = normalizedPhone(conversion.phone);
-  const user: Record<string, string | string[]> = {
-    emails_sha256: [sha256(conversion.email.trim().toLowerCase())],
-    countries: ["TR"],
-  };
+  const user: Record<string, string | string[]> = { countries: ["TR"] };
+
+  const email = conversion.email?.trim().toLowerCase();
+  if (email) user.emails_sha256 = [sha256(email)];
 
   if (conversion.browserReference) user.obref = conversion.browserReference;
   if (/^\d{8,15}$/.test(phone)) user.phone_numbers_sha256 = [sha256(phone)];

@@ -170,4 +170,11 @@ export function trackSellerLead(eventId: string, propertyType: string, district:
     },
     { eventID: eventId },
   );
+
+  window.oaiq?.(
+    "measure",
+    "lead_created",
+    { type: "customer_action" },
+    { event_id: eventId },
+  );
 }

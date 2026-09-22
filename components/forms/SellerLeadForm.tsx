@@ -3,7 +3,12 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
-import { captureAttribution, trackSellerLead } from "@/lib/marketing";
+import {
+  captureAttribution,
+  getOpenAiBrowserReference,
+  hasMeasurementConsent,
+  trackSellerLead,
+} from "@/lib/marketing";
 import { PROPERTY_INTENT_LABELS, type PropertyIntent } from "@/lib/property-intent";
 
 const PROPERTY_TYPES = ["Daire", "Villa / Müstakil Ev", "Arsa / Tarla", "İşyeri / Ticari", "Diğer"];
@@ -51,6 +56,9 @@ export default function SellerLeadForm({ allowRental = false }: { allowRental?: 
       website: String(form.get("website") || ""),
       form_started_at: startedAt,
       event_id: eventId,
+      source_url: window.location.href,
+      measurement_consent: hasMeasurementConsent(),
+      openai_browser_ref: getOpenAiBrowserReference(),
       attribution: captureAttribution(),
     };
 
