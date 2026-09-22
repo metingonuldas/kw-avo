@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { captureAttribution, trackAdvisorLead } from "@/lib/marketing";
+import {
+  captureAttribution,
+  getOpenAiBrowserReference,
+  hasMeasurementConsent,
+  trackAdvisorLead,
+} from "@/lib/marketing";
 
 const OFFICES = [
   { value: "KW Alesta", label: "KW Alesta — Bayraklı / Ege Perla" },
@@ -42,6 +47,9 @@ export default function AdvisorLeadForm() {
       website: String(form.get("website") || ""),
       form_started_at: startedAt,
       event_id: eventId,
+      source_url: window.location.href,
+      measurement_consent: hasMeasurementConsent(),
+      openai_browser_ref: getOpenAiBrowserReference(),
       attribution: captureAttribution(),
     };
 

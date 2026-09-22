@@ -46,25 +46,52 @@ function loadMetaPixel(pixelId: string) {
   fbq("track", "PageView");
 }
 
+function loadOpenAiPixel(pixelId: string) {
+  if (!pixelId) return;
+
+  if (!window.oaiq) {
+    const oaiq = function (...args: unknown[]) {
+      oaiq.q.push(args);
+    } as NonNullable<Window["oaiq"]> & { q: unknown[][] };
+    oaiq.q = [];
+    window.oaiq = oaiq;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://bzrcdn.openai.com/sdk/oaiq.min.js";
+    script.dataset.kwavoOpenAiPixel = "true";
+    document.head.appendChild(script);
+  }
+
+  window.oaiq("init", { pixelId });
+}
+
 export default function ConsentManager() {
   const [visible, setVisible] = useState(false);
   const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1074097965148552";
+  const openAiPixelId = process.env.NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID || "7yrR64Pby1j835dHz5Uumk";
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as ConsentChoice | null;
     if (saved === "all" || saved === "necessary") {
       updateGoogleConsent(saved);
-      if (saved === "all" && metaPixelId) loadMetaPixel(metaPixelId);
+      if (saved === "all") {
+        if (metaPixelId) loadMetaPixel(metaPixelId);
+        loadOpenAiPixel(openAiPixelId);
+      }
       return;
     }
     const timer = window.setTimeout(() => setVisible(true), 0);
     return () => window.clearTimeout(timer);
-  }, [metaPixelId]);
+  }, [metaPixelId, openAiPixelId]);
 
   function save(choice: ConsentChoice) {
     localStorage.setItem(STORAGE_KEY, choice);
     updateGoogleConsent(choice);
-    if (choice === "all" && metaPixelId) loadMetaPixel(metaPixelId);
+    if (choice === "all") {
+      if (metaPixelId) loadMetaPixel(metaPixelId);
+      loadOpenAiPixel(openAiPixelId);
+    }
     setVisible(false);
   }
 

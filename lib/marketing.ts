@@ -10,6 +10,7 @@ export type Attribution = {
   utm_term: string;
   gclid: string;
   fbclid: string;
+  oppref: string;
 };
 
 const STORAGE_KEY = "kwavo_attribution_v1";
@@ -21,6 +22,7 @@ const ATTRIBUTION_KEYS = [
   "utm_term",
   "gclid",
   "fbclid",
+  "oppref",
 ] as const;
 
 const emptyAttribution = (): Attribution => ({
@@ -33,6 +35,7 @@ const emptyAttribution = (): Attribution => ({
   utm_term: "",
   gclid: "",
   fbclid: "",
+  oppref: "",
 });
 
 export function captureAttribution(): Attribution {
@@ -101,6 +104,26 @@ export function trackAdvisorLead(eventId: string, office: string) {
     { content_name: "Danışman Adayı", content_category: office },
     { eventID: eventId },
   );
+
+  window.oaiq?.(
+    "measure",
+    "lead_created",
+    { type: "customer_action" },
+    { event_id: eventId },
+  );
+}
+
+export function hasMeasurementConsent() {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem("kwavo_consent_v1") === "all";
+}
+
+export function getOpenAiBrowserReference() {
+  if (typeof document === "undefined") return "";
+  const cookie = document.cookie
+    .split("; ")
+    .find((entry) => entry.startsWith("__obref="));
+  return cookie ? decodeURIComponent(cookie.slice("__obref=".length)) : "";
 }
 
 export function trackSellerLead(eventId: string, propertyType: string, district: string, intent: PropertyIntent = "sell") {

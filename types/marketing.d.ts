@@ -6,5 +6,6 @@ declare global {
     gtag?: (...args: unknown[]) => void;
     fbq?: ((...args: unknown[]) => void) & { callMethod?: (...args: unknown[]) => void; queue?: unknown[]; loaded?: boolean; version?: string };
     _fbq?: Window["fbq"];
+    oaiq?: ((...args: unknown[]) => void) & { q?: unknown[][] };
   }
 }

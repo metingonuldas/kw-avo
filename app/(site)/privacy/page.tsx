@@ -133,10 +133,12 @@ export default function PrivacyPage() {
         <div>
           <h2 className="font-semibold">8. Çerezler, Analitik ve Reklam Ölçümü</h2>
           <p className="mt-1">
-            Tercihinize bağlı olarak Google Analytics, Google Ads ve Meta
+            Tercihinize bağlı olarak Google Analytics, Google Ads, Meta ve OpenAI Ads
             teknolojileri; sayfa görüntüleme, form dönüşümü, kampanya parametreleri
             ve reklam tıklama kimlikleri gibi verileri performans ölçümü amacıyla
-            işleyebilir. Zorunlu olmayan analitik ve pazarlama depolaması, çerez
+            işleyebilir. OpenAI Ads dönüşüm eşleştirmesinde kullanılan e-posta ve
+            telefon bilgileri sunucudan gönderilmeden önce SHA-256 ile özetlenir.
+            Zorunlu olmayan analitik ve pazarlama depolaması, çerez
             tercih ekranındaki seçiminize göre etkinleştirilir. Reklam kaynakları,
             başvurunun hangi kampanyadan geldiğini anlayabilmek amacıyla başvuru
             kaydıyla ilişkilendirilebilir.

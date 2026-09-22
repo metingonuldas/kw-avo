@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { sendOpenAiLeadConversion } from "@/lib/openai-ads";
 
 export const dynamic = "force-dynamic";
 
@@ -103,6 +104,24 @@ export async function POST(request: Request) {
     });
 
     if (result.error) throw new Error(result.error.message);
+
+    if (body.measurement_consent === true && eventId) {
+      try {
+        await sendOpenAiLeadConversion({
+          eventId,
+          sourceUrl: clean(body.source_url, 1000),
+          oppref: clean(attribution.oppref, 500),
+          browserReference: clean(body.openai_browser_ref, 500),
+          email,
+          phone,
+          ipAddress: ip,
+          userAgent: clean(request.headers.get("user-agent"), 500),
+        });
+      } catch (conversionError) {
+        // Başvuru ulaştı; ölçüm servisindeki hata formu başarısız göstermemeli.
+        console.error("OpenAI Ads conversion error:", conversionError);
+      }
+    }
 
     // Portal aday panelinden "Danışman Ol" formu ve Kariyer Pusulası görüşme
     // talepleri beslenir; Danışman Pusulası (mevcut danışmanlar için) hariç.
