@@ -22,6 +22,7 @@ import CareerAssistant from "@/components/career/CareerAssistant";
 type StyleKey = "D" | "I" | "S" | "C";
 type Answer = { text: string; style: StyleKey };
 type Question = { prompt: string; context: string; answers: Answer[] };
+type CompassMode = "candidate" | "advisor";
 type IntakeData = {
   first_name: string;
   last_name: string;
@@ -34,6 +35,8 @@ type IntakeData = {
   education: string;
   gender: string;
   entrepreneurship: string;
+  office: string;
+  team_leader: string;
 };
 
 const QUESTIONS: Question[] = [
@@ -257,7 +260,8 @@ function calculate(answers: StyleKey[], tieOrder: StyleKey[]) {
   return { scores, percentages, primary: ranked[0], secondary: ranked[1] };
 }
 
-export default function CareerCompass() {
+export default function CareerCompass({ mode = "candidate" }: { mode?: CompassMode }) {
+  const isAdvisor = mode === "advisor";
   const [phase, setPhase] = useState<"intro" | "intake" | "quiz" | "result">("intro");
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<StyleKey[]>([]);
@@ -269,13 +273,14 @@ export default function CareerCompass() {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState("");
   const [answerPlan, setAnswerPlan] = useState({ orders: BALANCED_ANSWER_ORDERS, tieOrder: STYLE_ORDER });
+  const completionNotificationStarted = useRef(false);
   const result = useMemo(() => calculate(answers, answerPlan.tieOrder), [answers, answerPlan.tieOrder]);
   const resultSentRef = useRef(false);
 
   useEffect(() => { captureAttribution(); }, []);
 
   useEffect(() => {
-    if (phase !== "result" || resultSentRef.current) return;
+    if (isAdvisor || phase !== "result" || resultSentRef.current) return;
     resultSentRef.current = true;
     fetch("/api/career-result", {
       method: "POST",
@@ -293,12 +298,12 @@ export default function CareerCompass() {
     }).catch(() => {
       // Sonuç senkronizasyonu başarısız olsa da sonuç ekranı gösterilmeye devam eder.
     });
-  }, [phase, intake, result]);
+  }, [phase, intake, isAdvisor, result]);
 
   useEffect(() => {
     const targets = {
       intro: "pusula-baslangic",
-      intake: "aday-formu",
+      intake: isAdvisor ? "danisman-formu" : "aday-formu",
       quiz: "pusula-kart",
       result: "sonuc",
     } as const;
@@ -313,7 +318,7 @@ export default function CareerCompass() {
       window.cancelAnimationFrame(firstFrame);
       window.cancelAnimationFrame(secondFrame);
     };
-  }, [phase, current]);
+  }, [phase, current, isAdvisor]);
 
   function showIntake() {
     setStartedAt(Date.now());
@@ -321,12 +326,16 @@ export default function CareerCompass() {
   }
 
   function beginQuiz() {
+    completionNotificationStarted.current = false;
+    resultSentRef.current = false;
     setPhase("quiz");
     setCurrent(0);
     setAnswers([]);
   }
 
   function restartQuiz() {
+    completionNotificationStarted.current = false;
+    resultSentRef.current = false;
     setPhase("quiz");
     setCurrent(0);
     setAnswers([]);
@@ -349,9 +358,20 @@ export default function CareerCompass() {
       education: String(form.get("education") || ""),
       gender: String(form.get("gender") || ""),
       entrepreneurship: String(form.get("entrepreneurship") || ""),
+      office: String(form.get("office") || ""),
+      team_leader: String(form.get("team_leader") || ""),
     };
 
     try {
+      if (isAdvisor) {
+        if (!data.first_name || !data.last_name || !data.email || !data.phone || !data.office || !data.team_leader || form.get("consent_terms") !== "on") {
+          throw new Error("missing_fields");
+        }
+        setAnswerPlan(createAnswerPlan());
+        setIntake(data);
+        beginQuiz();
+        return;
+      }
       const response = await fetch("/api/career-profile-lead", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -374,11 +394,44 @@ export default function CareerCompass() {
     }
   }
 
+  async function submitCompletedAssessment(completed: ReturnType<typeof calculate>) {
+    if (isAdvisor || !intake || completionNotificationStarted.current) return;
+    completionNotificationStarted.current = true;
+
+    try {
+      const response = await fetch("/api/advisor-lead", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        keepalive: true,
+        body: JSON.stringify({
+          name: `${intake.first_name} ${intake.last_name}`,
+          email: intake.email,
+          phone: intake.phone,
+          source: "career_compass_completed",
+          profile: completed.primary,
+          secondary_profile: completed.secondary,
+          profile_scores: completed.percentages,
+          consent_terms: true,
+          consent_marketing: false,
+          website: "",
+          form_started_at: startedAt || Date.now() - 5000,
+          event_id: crypto.randomUUID(),
+          attribution: captureAttribution(),
+        }),
+      });
+      if (!response.ok) throw new Error("request_failed");
+    } catch (error) {
+      // Sonuç ekranını kesintiye uğratma; operasyonel hata tarayıcı konsolundan izlenebilir.
+      console.error("Kariyer Pusulası completion notification failed:", error);
+    }
+  }
+
   function choose(style: StyleKey) {
     const next = [...answers];
     next[current] = style;
     setAnswers(next);
     if (current === QUESTIONS.length - 1) {
+      void submitCompletedAssessment(calculate(next, answerPlan.tieOrder));
       setPhase("result");
     } else {
       setCurrent((value) => value + 1);
@@ -396,9 +449,12 @@ export default function CareerCompass() {
       email: intake?.email || "",
       phone: intake?.phone || "",
       office: String(form.get("office") || "Kararsızım"),
-      experience: String(form.get("experience") || "Deneyimim yok"),
+      experience: isAdvisor ? "Mevcut danışman" : String(form.get("experience") || "Deneyimim yok"),
       preferred_time: String(form.get("preferred_time") || "En kısa sürede"),
-      note: "Kariyer Pusulası üzerinden görüşme talebi.",
+      note: isAdvisor
+        ? `Danışman Pusulası gelişim görüşmesi talebi. Takım lideri: ${intake?.team_leader || "Belirtilmedi"}. Görüşme odağı: ${String(form.get("meeting_focus") || "Genel gelişim değerlendirmesi")}.`
+        : "Kariyer Pusulası üzerinden görüşme talebi.",
+      source: isAdvisor ? "advisor_compass" : "career_compass",
       profile: result.primary,
       secondary_profile: result.secondary,
       profile_scores: result.percentages,
@@ -432,25 +488,37 @@ export default function CareerCompass() {
           <div className="pointer-events-none absolute -left-44 top-4 h-80 w-80 rounded-full bg-[#ba0c2f]/10 blur-3xl" />
           <div className="relative">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#ba0c2f]/20 bg-white/70 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#8f0a25]">
-              <Compass size={15} /> KWAVO Kariyer Pusulası
+              <Compass size={15} /> {isAdvisor ? "KWAVO Danışman Pusulası" : "KWAVO Kariyer Pusulası"}
             </div>
-            <h1 className="mt-6 max-w-3xl text-[2.6rem] font-black leading-[0.98] tracking-[-0.05em] sm:mt-7 sm:text-6xl lg:text-7xl">Gayrimenkulde nasıl bir iz bırakırsınız?</h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-neutral-600 sm:mt-6 sm:text-lg sm:leading-8">12 kısa senaryoda doğal çalışma stilinize dair ilk sinyalleri keşfedin. Test sonunda kısa ön değerlendirmenizi görün; ayrıntılı kariyer haritanızı uzmanımızla birlikte yorumlayın.</p>
+            <h1 className="mt-6 max-w-3xl text-[2.6rem] font-black leading-[0.98] tracking-[-0.05em] sm:mt-7 sm:text-6xl lg:text-7xl">{isAdvisor ? "Üretim stilinizi birlikte geliştirelim." : "Gayrimenkulde nasıl bir iz bırakırsınız?"}</h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-neutral-600 sm:mt-6 sm:text-lg sm:leading-8">{isAdvisor ? "12 kısa senaryoda doğal çalışma yaklaşımınıza dair sinyalleri belirleyin. Ayrıntılı değerlendirmeniz, gelişim görüşmesinde takım liderinizle birlikte ele alınacak." : "12 kısa senaryoda doğal çalışma stilinize dair ilk sinyalleri keşfedin. Test sonunda kısa ön değerlendirmenizi görün; ayrıntılı kariyer haritanızı uzmanımızla birlikte yorumlayın."}</p>
             <button onClick={showIntake} className="mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-2xl bg-[#ba0c2f] px-6 py-4 font-bold text-white shadow-[0_16px_45px_rgba(186,12,47,0.28)] transition active:scale-[0.99] sm:mt-8 sm:w-auto sm:hover:-translate-y-0.5 sm:hover:bg-[#a00a29]">
-              Ücretsiz testi başlat <ArrowRight size={19} />
+              {isAdvisor ? "Danışman Pusulası'nı başlat" : "Ücretsiz testi başlat"} <ArrowRight size={19} />
             </button>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500">
               <span className="inline-flex items-center gap-2"><Sparkles size={16} /> Yaklaşık 3 dakika</span>
-              <span className="inline-flex items-center gap-2"><ShieldCheck size={16} /> Üyelik ve ücret gerekmez</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck size={16} /> {isAdvisor ? "Kurum içi gelişim çalışması" : "Üyelik ve ücret gerekmez"}</span>
             </div>
           </div>
           <div className="relative rounded-3xl border border-black/10 bg-[#1e1b1c] p-3 shadow-2xl sm:rounded-[2rem] sm:p-6">
             <div className="rounded-2xl bg-white p-5 sm:rounded-[1.5rem] sm:p-8">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-400">Olası sonuçlar</p>
-              <h2 className="mt-2 text-2xl font-black">Dört stil, tek bir doğru yok.</h2>
-              <p className="mt-2 text-sm leading-6 text-neutral-600">Pusula, baskın eğiliminizi ve onu destekleyen ikinci stilinizi gösterir.</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-400">{isAdvisor ? "Gelişim odağı" : "Olası sonuçlar"}</p>
+              <h2 className="mt-2 text-2xl font-black">{isAdvisor ? "Sonuç değil, uygulanabilir bir gelişim planı." : "Dört stil, tek bir doğru yok."}</h2>
+              <p className="mt-2 text-sm leading-6 text-neutral-600">{isAdvisor ? "Pusula, çalışma yaklaşımınızı anlamlandırmak ve görüşmede doğru gelişim başlıklarına odaklanmak için kullanılır." : "Pusula, baskın eğiliminizi ve onu destekleyen ikinci stilinizi gösterir."}</p>
               <div className="mt-5 grid gap-2.5 min-[360px]:grid-cols-2 sm:mt-6 sm:gap-3">
-                {STYLE_ORDER.map((key) => (
+                {isAdvisor ? (
+                  [
+                    ["01", "Müşteri ilişkileri", "İletişim ve güven oluşturma yaklaşımınızı konuşun."],
+                    ["02", "Üretim sistemi", "Aktivite, takip ve sonuç alışkanlıklarınızı değerlendirin."],
+                    ["03", "Kişisel gelişim", "Güçlü yönlerinize uygun gelişim alanlarını netleştirin."],
+                    ["04", "Aksiyon planı", "Görüşmeden uygulanabilir sonraki adımlarla ayrılın."],
+                  ].map(([number, title, description]) => (
+                    <article key={number} className="rounded-xl border border-black/10 p-3 sm:rounded-2xl sm:p-4">
+                      <div className="flex items-center gap-2 sm:gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#1e1b1c] text-xs font-black text-white sm:h-10 sm:w-10 sm:rounded-xl">{number}</span><h3 className="text-sm font-bold sm:text-base">{title}</h3></div>
+                      <p className="mt-2 text-xs leading-4 text-neutral-500 sm:mt-3 sm:text-sm sm:leading-5">{description}</p>
+                    </article>
+                  ))
+                ) : STYLE_ORDER.map((key) => (
                   <article key={key} className="rounded-xl border border-black/10 p-3 sm:rounded-2xl sm:p-4">
                     <div className="flex items-center gap-2 sm:gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-black text-white sm:h-10 sm:w-10 sm:rounded-xl" style={{ backgroundColor: PROFILES[key].color }}>{key}</span><h3 className="text-sm font-bold sm:text-base">{PROFILES[key].name}</h3></div>
                     <p className="mt-2 text-xs leading-4 text-neutral-500 sm:mt-3 sm:text-sm sm:leading-5">{PROFILES[key].tagline}</p>
@@ -458,7 +526,7 @@ export default function CareerCompass() {
                 ))}
               </div>
             </div>
-            <p className="px-4 pb-1 pt-4 text-center text-xs leading-5 text-white/50">Kişisel farkındalık içindir; bilimsel tanı veya işe alım elemesi değildir.</p>
+            <p className="px-4 pb-1 pt-4 text-center text-xs leading-5 text-white/50">Kişisel farkındalık içindir; performans puanı, bilimsel tanı veya işe alım elemesi değildir.</p>
           </div>
         </section>
       </main>
@@ -469,34 +537,43 @@ export default function CareerCompass() {
     const fieldClass = "mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none transition focus:border-[#ba0c2f] focus:ring-2 focus:ring-[#ba0c2f]/10";
     return (
       <main className="min-h-[calc(100vh-64px)] min-h-[calc(100dvh-64px)] bg-[#f5f1eb] px-3 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-10 lg:py-14">
-        <section id="aday-formu" tabIndex={-1} className="mx-auto max-w-4xl outline-none">
+        <section id={isAdvisor ? "danisman-formu" : "aday-formu"} tabIndex={-1} className="mx-auto max-w-4xl outline-none">
           <button onClick={() => setPhase("intro")} className="mb-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-black sm:mb-5"><ArrowLeft size={17} /> Geri dön</button>
           <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-xl sm:rounded-[2rem]">
             <div className="border-b border-black/8 bg-[#1e1b1c] px-5 py-5 text-white sm:px-9 sm:py-7">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/55">Adım 1 / 2</p>
-              <h1 className="mt-2 text-2xl font-black sm:text-3xl">Sizi biraz tanıyalım</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">Bilgileriniz sonucu değiştirmez. Kariyer Pusulası deneyimini takip edebilmemiz ve talebiniz halinde sizinle iletişim kurabilmemiz için kullanılır.</p>
+              <h1 className="mt-2 text-2xl font-black sm:text-3xl">{isAdvisor ? "Gelişim görüşmenizi eşleştirelim" : "Sizi biraz tanıyalım"}</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">{isAdvisor ? "Bilgileriniz sonucu değiştirmez. Yalnızca değerlendirmenizi doğru ofis ve takım lideriyle eşleştirmek için kullanılır." : "Bilgileriniz sonucu değiştirmez. Kariyer Pusulası deneyimini takip edebilmemiz ve talebiniz halinde sizinle iletişim kurabilmemiz için kullanılır."}</p>
             </div>
             <form onSubmit={submitIntake} className="grid gap-4 p-5 sm:grid-cols-2 sm:gap-5 sm:p-9">
               <label className="text-sm font-semibold">Ad<input name="first_name" required autoComplete="given-name" className={fieldClass} placeholder="Adınız" /></label>
               <label className="text-sm font-semibold">Soyad<input name="last_name" required autoComplete="family-name" className={fieldClass} placeholder="Soyadınız" /></label>
               <label className="text-sm font-semibold">E-posta<input name="email" required type="email" autoComplete="email" className={fieldClass} placeholder="ornek@email.com" /></label>
               <label className="text-sm font-semibold">Telefon<input name="phone" required autoComplete="tel" inputMode="tel" pattern="[0-9+ ()-]{10,20}" className={fieldClass} placeholder="05XX XXX XX XX" /></label>
-              <label className="text-sm font-semibold">Doğum tarihi<input name="birth_date" required type="date" className={fieldClass} /></label>
-              <label className="text-sm font-semibold">Meslek<input name="occupation" required className={fieldClass} placeholder="Mesleğiniz" /></label>
-              <label className="text-sm font-semibold">Yaşadığınız il<input name="city" required autoComplete="address-level1" className={fieldClass} placeholder="İzmir" /></label>
-              <label className="text-sm font-semibold">Yaşadığınız ilçe<input name="district" required autoComplete="address-level2" className={fieldClass} placeholder="İlçeniz" /></label>
-              <label className="text-sm font-semibold">Eğitim durumu<select name="education" required defaultValue="" className={fieldClass}><option value="" disabled>Seçin</option><option>Lise</option><option>Ön lisans</option><option>Lisans</option><option>Yüksek lisans</option><option>Doktora</option><option>Diğer</option></select></label>
-              <label className="text-sm font-semibold">Cinsiyet<select name="gender" required defaultValue="" className={fieldClass}><option value="" disabled>Seçin</option><option>Kadın</option><option>Erkek</option><option>Belirtmek istemiyorum</option><option>Diğer</option></select></label>
-              <fieldset className="sm:col-span-2">
-                <legend className="text-sm font-semibold">Daha önce kendi işinizi kurdunuz veya bir girişimde bulundunuz mu?</legend>
-                <div className="mt-3 grid grid-cols-2 gap-3 text-sm"><label className="flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border border-black/10 px-4"><input name="entrepreneurship" type="radio" value="Hayır" required /> Hayır</label><label className="flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border border-black/10 px-4"><input name="entrepreneurship" type="radio" value="Evet" required /> Evet</label></div>
-              </fieldset>
+              {isAdvisor ? (
+                <>
+                  <label className="text-sm font-semibold">Bağlı olduğunuz ofis<select name="office" required defaultValue="" className={fieldClass}><option value="" disabled>Ofis seçin</option><option>KW Alesta</option><option>KW Viya</option><option>KW Orsa</option></select></label>
+                  <label className="text-sm font-semibold">Takım lideriniz<input name="team_leader" required className={fieldClass} placeholder="Ad Soyad" /></label>
+                </>
+              ) : (
+                <>
+                  <label className="text-sm font-semibold">Doğum tarihi<input name="birth_date" required type="date" className={fieldClass} /></label>
+                  <label className="text-sm font-semibold">Meslek<input name="occupation" required className={fieldClass} placeholder="Mesleğiniz" /></label>
+                  <label className="text-sm font-semibold">Yaşadığınız il<input name="city" required autoComplete="address-level1" className={fieldClass} placeholder="İzmir" /></label>
+                  <label className="text-sm font-semibold">Yaşadığınız ilçe<input name="district" required autoComplete="address-level2" className={fieldClass} placeholder="İlçeniz" /></label>
+                  <label className="text-sm font-semibold">Eğitim durumu<select name="education" required defaultValue="" className={fieldClass}><option value="" disabled>Seçin</option><option>Lise</option><option>Ön lisans</option><option>Lisans</option><option>Yüksek lisans</option><option>Doktora</option><option>Diğer</option></select></label>
+                  <label className="text-sm font-semibold">Cinsiyet<select name="gender" required defaultValue="" className={fieldClass}><option value="" disabled>Seçin</option><option>Kadın</option><option>Erkek</option><option>Belirtmek istemiyorum</option><option>Diğer</option></select></label>
+                  <fieldset className="sm:col-span-2">
+                    <legend className="text-sm font-semibold">Daha önce kendi işinizi kurdunuz veya bir girişimde bulundunuz mu?</legend>
+                    <div className="mt-3 grid grid-cols-2 gap-3 text-sm"><label className="flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border border-black/10 px-4"><input name="entrepreneurship" type="radio" value="Hayır" required /> Hayır</label><label className="flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border border-black/10 px-4"><input name="entrepreneurship" type="radio" value="Evet" required /> Evet</label></div>
+                  </fieldset>
+                </>
+              )}
               <input name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px] h-px w-px" aria-hidden="true" />
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-neutral-50 p-4 text-xs leading-5 text-neutral-600 sm:col-span-2"><input name="consent_terms" type="checkbox" required className="mt-1 h-4 w-4 shrink-0" /><span>Bilgilerimin başvuru sürecinin yürütülmesi ve benimle iletişim kurulması amacıyla işlenmesini kabul ediyorum. <a href="/privacy" target="_blank" className="font-semibold underline">Gizlilik Politikası</a></span></label>
+              <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-neutral-50 p-4 text-xs leading-5 text-neutral-600 sm:col-span-2"><input name="consent_terms" type="checkbox" required className="mt-1 h-4 w-4 shrink-0" /><span>{isAdvisor ? "Bilgilerimin kurum içi gelişim görüşmesinin planlanması ve değerlendirme sürecinin yürütülmesi amacıyla işlenmesini kabul ediyorum." : "Bilgilerimin başvuru sürecinin yürütülmesi ve benimle iletişim kurulması amacıyla işlenmesini kabul ediyorum."} <a href="/privacy" target="_blank" className="font-semibold underline">Gizlilik Politikası</a></span></label>
               <div className="flex flex-col-reverse gap-3 border-t border-black/8 pt-5 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-neutral-500"><ShieldCheck className="mr-1 inline" size={15} /> Bilgileriniz üçüncü kişilerle pazarlama amacıyla paylaşılmaz.</p>
-                <button disabled={intakeSubmitting} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-6 py-3.5 font-bold text-white transition hover:bg-[#a00a29] disabled:opacity-60 sm:w-auto">{intakeSubmitting ? "Kaydediliyor…" : "Kaydet ve teste geç"}<ArrowRight size={18} /></button>
+                <p className="text-xs text-neutral-500"><ShieldCheck className="mr-1 inline" size={15} /> {isAdvisor ? "Değerlendirmeniz yalnızca yetkili gelişim ekibiyle paylaşılır." : "Bilgileriniz üçüncü kişilerle pazarlama amacıyla paylaşılmaz."}</p>
+                <button disabled={intakeSubmitting} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-6 py-3.5 font-bold text-white transition hover:bg-[#a00a29] disabled:opacity-60 sm:w-auto">{intakeSubmitting ? "Hazırlanıyor…" : isAdvisor ? "Teste geç" : "Kaydet ve teste geç"}<ArrowRight size={18} /></button>
               </div>
               {intakeError && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700 sm:col-span-2">{intakeError}</p>}
             </form>
@@ -547,14 +624,14 @@ export default function CareerCompass() {
           <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
             <div className="p-5 sm:p-10 lg:p-12">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><Check size={28} /></div>
-              <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Ön değerlendirmeniz hazır</p>
-              <h1 className="mt-2 text-3xl font-black tracking-[-0.03em] sm:text-4xl">{intake?.first_name || "Tebrikler"}, çalışma stilinizde güçlü bir sinyal yakaladık.</h1>
-              <p className="mt-5 text-base leading-7 text-neutral-600">{primary.teaser}</p>
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">{isAdvisor ? "Değerlendirmeniz tamamlandı" : "Ön değerlendirmeniz hazır"}</p>
+              <h1 className="mt-2 text-3xl font-black tracking-[-0.03em] sm:text-4xl">{intake?.first_name || "Tebrikler"}, {isAdvisor ? "gelişim görüşmeniz için güçlü başlıklar belirledik." : "çalışma stilinizde güçlü bir sinyal yakaladık."}</h1>
+              <p className="mt-5 text-base leading-7 text-neutral-600">{isAdvisor ? "Çalışma yaklaşımınız, müşteri ilişkileriniz ve üretim alışkanlıklarınız hakkında konuşmaya değer örüntüler oluştu. Sonucunuzu doğru bağlamda değerlendirmek için takım liderinizle birlikte ele almanızı öneriyoruz." : primary.teaser}</p>
               <div className="mt-6 rounded-2xl border border-[#ba0c2f]/15 bg-[#fff7f8] p-4 text-sm leading-6 text-neutral-700">
                 <Sparkles className="mr-2 inline text-[#ba0c2f]" size={18} />
-                Bu yalnızca ilk ipucu. Güçlü yönleriniz, gelişim alanlarınız ve size uygun iş planı detaylı değerlendirmede netleşecek.
+                {isAdvisor ? "Profil adı, puanlar ve ayrıntılı yorumlar bu ekranda paylaşılmaz. Değerlendirmeniz, gelişim görüşmesinde birlikte açılacak." : "Bu yalnızca ilk ipucu. Güçlü yönleriniz, gelişim alanlarınız ve size uygun iş planı detaylı değerlendirmede netleşecek."}
               </div>
-              <a href="#gorusme-formu" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-6 py-3.5 font-bold text-white shadow-[0_12px_32px_rgba(186,12,47,0.22)] transition active:scale-[0.99] sm:w-auto sm:hover:bg-[#a00a29]">Ücretsiz görüşme planla <ArrowRight size={18} /></a>
+              <a href="#gorusme-formu" className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-6 py-3.5 font-bold text-white shadow-[0_12px_32px_rgba(186,12,47,0.22)] transition active:scale-[0.99] sm:w-auto sm:hover:bg-[#a00a29]">{isAdvisor ? "Gelişim görüşmesi talep et" : "Ücretsiz görüşme planla"} <ArrowRight size={18} /></a>
             </div>
 
             <div className="relative min-h-[390px] overflow-hidden border-t border-black/8 bg-[#1e1b1c] p-5 text-white sm:p-10 lg:border-l lg:border-t-0">
@@ -570,8 +647,8 @@ export default function CareerCompass() {
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#1e1b1c]/20 via-[#1e1b1c]/55 to-[#1e1b1c]/90 p-6 text-center">
                 <div className="max-w-xs">
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/15 bg-white/10 backdrop-blur"><LockKeyhole size={28} /></div>
-                  <h2 className="mt-5 text-2xl font-black">Detaylı kariyer haritanız hazır</h2>
-                  <p className="mt-3 text-sm leading-6 text-white/65">Profil dağılımınız, güçlü yönleriniz ve gelişim önerileriniz uzman görüşmesinde birlikte açılacak.</p>
+                  <h2 className="mt-5 text-2xl font-black">{isAdvisor ? "Detaylı gelişim haritanız hazır" : "Detaylı kariyer haritanız hazır"}</h2>
+                  <p className="mt-3 text-sm leading-6 text-white/65">Profil dağılımınız, güçlü yönleriniz ve gelişim önerileriniz {isAdvisor ? "takım liderinizle yapacağınız görüşmede" : "uzman görüşmesinde"} birlikte açılacak.</p>
                 </div>
               </div>
             </div>
@@ -582,8 +659,8 @@ export default function CareerCompass() {
           <div className="max-w-2xl"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Görüşmede sizi ne bekliyor?</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">Sonucu bir etiketten uygulanabilir bir plana dönüştürelim.</h2></div>
           <div className="mt-7 grid gap-3 sm:grid-cols-3 sm:gap-4">
             <article className="rounded-2xl bg-[#f5f1eb] p-5"><GraduationCap className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">Güçlü yönler ve gelişim alanları</h3><p className="mt-2 text-sm leading-6 text-neutral-600">Hangi doğal özelliklerinizi büyütebileceğinizi ve hangi alışkanlıkların sizi yavaşlatabileceğini konuşalım.</p></article>
-            <article className="rounded-2xl bg-[#f5f1eb] p-5"><Laptop className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">Size uygun araçlar</h3><p className="mt-2 text-sm leading-6 text-neutral-600">Eğitim, koçluk, KW Command CRM, teknoloji ve pazarlama desteğinin işinize nasıl uyarlanacağını gösterelim.</p></article>
-            <article className="rounded-2xl bg-[#f5f1eb] p-5"><Users className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">Kişisel başlangıç rotası</h3><p className="mt-2 text-sm leading-6 text-neutral-600">Deneyiminize ve hedeflerinize göre ilk adımları; liderlik desteği ve üç ofis ekosistemiyle birlikte planlayalım.</p></article>
+            <article className="rounded-2xl bg-[#f5f1eb] p-5"><Laptop className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">{isAdvisor ? "Üretim sistemi ve araçlar" : "Size uygun araçlar"}</h3><p className="mt-2 text-sm leading-6 text-neutral-600">Eğitim, koçluk, KW Command CRM, teknoloji ve pazarlama desteğinin işinize nasıl uyarlanacağını gösterelim.</p></article>
+            <article className="rounded-2xl bg-[#f5f1eb] p-5"><Users className="text-[#ba0c2f]" size={24} /><h3 className="mt-4 font-black">{isAdvisor ? "Kişisel gelişim rotası" : "Kişisel başlangıç rotası"}</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{isAdvisor ? "Hedeflerinize göre öncelikli gelişim adımlarını takım liderinizle birlikte planlayalım." : "Deneyiminize ve hedeflerinize göre ilk adımları; liderlik desteği ve üç ofis ekosistemiyle birlikte planlayalım."}</p></article>
           </div>
         </section>
 
@@ -593,29 +670,29 @@ export default function CareerCompass() {
               <div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f9e9ed] text-[#ba0c2f]"><CalendarCheck size={24} /></div>
                 <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#ba0c2f]">Sonraki adım</p>
-                <h2 className="mt-2 text-2xl font-black sm:text-3xl">Kariyer haritanızı birlikte açalım.</h2>
-                <p className="mt-4 leading-7 text-neutral-600">Yaklaşık 20 dakikalık ücretsiz tanışma görüşmesinde sonucunuzu ve gayrimenkulde daha güçlü ilerlemek için kullanabileceğiniz araçları konuşalım. Görüşme bir iş teklifi veya taahhüt değildir.</p>
+                <h2 className="mt-2 text-2xl font-black sm:text-3xl">{isAdvisor ? "Gelişim haritanızı birlikte açalım." : "Kariyer haritanızı birlikte açalım."}</h2>
+                <p className="mt-4 leading-7 text-neutral-600">{isAdvisor ? "Takım liderinizle yapacağınız gelişim görüşmesinde sonucunuzu, üretim alışkanlıklarınızı ve öncelikli aksiyonlarınızı birlikte değerlendirin." : "Yaklaşık 20 dakikalık ücretsiz tanışma görüşmesinde sonucunuzu ve gayrimenkulde daha güçlü ilerlemek için kullanabileceğiniz araçları konuşalım. Görüşme bir iş teklifi veya taahhüt değildir."}</p>
               </div>
               <form onSubmit={submitLead} className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm font-semibold">Görüşmek istediğiniz ofis<select name="office" defaultValue="Kararsızım" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>Kararsızım</option><option>KW Alesta</option><option>KW Viya</option><option>KW Orsa</option></select></label>
-                <label className="text-sm font-semibold">Gayrimenkul deneyimi<select name="experience" defaultValue="Deneyimim yok" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>Deneyimim yok</option><option>1 yıldan az</option><option>1-3 yıl</option><option>3 yıldan fazla</option></select></label>
+                {isAdvisor ? <input type="hidden" name="office" value={intake?.office || "Kararsızım"} /> : <label className="text-sm font-semibold">Görüşmek istediğiniz ofis<select name="office" defaultValue="Kararsızım" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>Kararsızım</option><option>KW Alesta</option><option>KW Viya</option><option>KW Orsa</option></select></label>}
+                {isAdvisor ? <label className="text-sm font-semibold">Görüşme odağı<select name="meeting_focus" defaultValue="Genel gelişim değerlendirmesi" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>Genel gelişim değerlendirmesi</option><option>Portföy ve müşteri geliştirme</option><option>Takip ve üretim disiplini</option><option>Teknoloji ve iş sistemleri</option><option>Kişisel marka ve iletişim</option></select></label> : <label className="text-sm font-semibold">Gayrimenkul deneyimi<select name="experience" defaultValue="Deneyimim yok" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>Deneyimim yok</option><option>1 yıldan az</option><option>1-3 yıl</option><option>3 yıldan fazla</option></select></label>}
                 <label className="text-sm font-semibold">Uygun zaman<select name="preferred_time" defaultValue="En kısa sürede" className="mt-1.5 min-h-12 w-full rounded-xl border border-black/15 bg-white px-3 py-3 text-base font-normal outline-none focus:border-[#ba0c2f]"><option>En kısa sürede</option><option>Hafta içi 09:00-12:00</option><option>Hafta içi 12:00-17:00</option><option>Hafta içi 17:00 sonrası</option></select></label>
                 <input name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px] h-px w-px" aria-hidden="true" />
-                <button disabled={submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-5 py-3.5 font-bold text-white transition hover:bg-[#a00a29] disabled:opacity-60 sm:col-span-2">{submitting ? "Gönderiliyor…" : "Ücretsiz Görüşme Talep Et"}<ArrowRight size={18} /></button>
+                <button disabled={submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ba0c2f] px-5 py-3.5 font-bold text-white transition hover:bg-[#a00a29] disabled:opacity-60 sm:col-span-2">{submitting ? "Gönderiliyor…" : isAdvisor ? "Gelişim Görüşmesi Talep Et" : "Ücretsiz Görüşme Talep Et"}<ArrowRight size={18} /></button>
                 {formError && <p role="alert" className="text-sm text-red-700 sm:col-span-2">{formError}</p>}
               </form>
             </div>
           ) : (
-            <div className="py-6 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><Check size={28} /></div><h2 className="mt-4 text-2xl font-black">Görüşme talebiniz alındı.</h2><p className="mt-2 text-neutral-600">Ekibimiz tercih ettiğiniz ofis ve zaman bilgisini dikkate alarak sizinle iletişim kuracak.</p></div>
+            <div className="py-6 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><Check size={28} /></div><h2 className="mt-4 text-2xl font-black">Görüşme talebiniz alındı.</h2><p className="mt-2 text-neutral-600">{isAdvisor ? "Talebiniz takım liderinize ve yetkili gelişim ekibine iletilecek." : "Ekibimiz tercih ettiğiniz ofis ve zaman bilgisini dikkate alarak sizinle iletişim kuracak."}</p></div>
           )}
         </section>
 
-        <CareerAssistant
+        {!isAdvisor && <CareerAssistant
           firstName={intake?.first_name || ""}
           primary={result.primary}
           secondary={result.secondary}
           scores={result.percentages}
-        />
+        />}
 
         <div className="mt-7 flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
           <p className="max-w-3xl text-xs leading-5 text-neutral-500">Bu kısa çalışma, DISC davranış yaklaşımından ilham alan bir öz farkındalık deneyimidir. Psikometrik değerlendirme, klinik tanı veya işe alım eleme aracı değildir.</p>

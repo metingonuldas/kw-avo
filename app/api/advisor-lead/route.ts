@@ -6,8 +6,15 @@ import { sendOpenAiLeadConversion } from "@/lib/openai-ads";
 export const dynamic = "force-dynamic";
 
 const OFFICES = ["KW Alesta", "KW Viya", "KW Orsa", "Kararsızım"];
-const EXPERIENCES = ["Deneyimim yok", "1 yıldan az", "1-3 yıl", "3 yıldan fazla"];
+const EXPERIENCES = ["Deneyimim yok", "1 yıldan az", "1-3 yıl", "3 yıldan fazla", "Mevcut danışman"];
 const TIMES = ["En kısa sürede", "Hafta içi 09:00-12:00", "Hafta içi 12:00-17:00", "Hafta içi 17:00 sonrası"];
+const PROFILE_KEYS = ["D", "I", "S", "C"];
+const PROFILE_NAMES: Record<string, string> = {
+  D: "Öncü",
+  I: "Bağ Kurucu",
+  S: "Dengeleyici",
+  C: "Stratejist",
+};
 const attempts = new Map<string, { count: number; resetAt: number }>();
 
 function clean(value: unknown, max = 300) {
@@ -51,6 +58,9 @@ export async function POST(request: Request) {
     const eventId = clean(body.event_id, 80);
     const profile = clean(body.profile, 4);
     const secondaryProfile = clean(body.secondary_profile, 4);
+    const source = clean(body.source, 40);
+    const isAdvisorCompass = source === "advisor_compass";
+    const isCareerCompassCompletion = source === "career_compass_completed";
     const profileScores = body.profile_scores && typeof body.profile_scores === "object"
       ? Object.entries(body.profile_scores).map(([key, value]) => `${clean(key, 2)}: %${Number(value) || 0}`).join(" · ")
       : "";
@@ -59,8 +69,11 @@ export async function POST(request: Request) {
     if (!startedAt || Date.now() - startedAt < 2500) return NextResponse.json({ error: "invalid_submission" }, { status: 400 });
     if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "invalid_contact" }, { status: 400 });
     if (!/^[0-9+ ()-]{10,20}$/.test(phone)) return NextResponse.json({ error: "invalid_phone" }, { status: 400 });
-    if (!OFFICES.includes(office) || !EXPERIENCES.includes(experience) || !TIMES.includes(preferredTime)) {
+    if (!isCareerCompassCompletion && (!OFFICES.includes(office) || !EXPERIENCES.includes(experience) || !TIMES.includes(preferredTime))) {
       return NextResponse.json({ error: "invalid_selection" }, { status: 400 });
+    }
+    if (isCareerCompassCompletion && (!PROFILE_KEYS.includes(profile) || !PROFILE_KEYS.includes(secondaryProfile))) {
+      return NextResponse.json({ error: "invalid_profile" }, { status: 400 });
     }
     if (!body.consent_terms) return NextResponse.json({ error: "consent_required" }, { status: 400 });
 
@@ -73,15 +86,25 @@ export async function POST(request: Request) {
       ["Yönlendiren", attribution.referrer],
     ].filter(([, value]) => value);
 
+    const heading = isCareerCompassCompletion
+      ? "Kariyer Pusulası Testi Tamamlandı"
+      : isAdvisorCompass
+        ? "Danışman Pusulası Gelişim Görüşmesi"
+        : "Yeni Danışman Adayı";
+    const subject = isCareerCompassCompletion
+      ? `Kariyer Pusulası Tamamlandı: ${name} — Profil ${profile}`
+      : `${isAdvisorCompass ? "Danışman Pusulası Görüşme Talebi" : "Yeni Danışman Adayı"}: ${name} — ${office}${profile ? ` — Profil ${profile}` : ""}`;
+
     const emailHtml = `
       <div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#18181b">
-        <div style="background:#ba0c2f;color:white;padding:22px;border-radius:12px 12px 0 0"><h1 style="margin:0;font-size:21px">Yeni Danışman Adayı</h1></div>
+        <div style="background:#ba0c2f;color:white;padding:22px;border-radius:12px 12px 0 0"><h1 style="margin:0;font-size:21px">${heading}</h1></div>
         <div style="border:1px solid #e5e7eb;border-top:0;padding:24px;border-radius:0 0 12px 12px">
           <p><strong>Ad Soyad:</strong> ${html(name)}</p><p><strong>Telefon:</strong> ${html(phone)}</p>
-          <p><strong>E-posta:</strong> ${html(email)}</p><p><strong>Ofis:</strong> ${html(office)}</p>
-          <p><strong>Deneyim:</strong> ${html(experience)}</p><p><strong>Uygun zaman:</strong> ${html(preferredTime)}</p>
-          <p><strong>Not:</strong> ${html(note || "—")}</p>
-          ${profile ? `<p><strong>Kariyer Pusulası:</strong> ${html(profile)} baskın · ${html(secondaryProfile)} destekleyici</p><p><strong>Profil dağılımı:</strong> ${html(profileScores)}</p>` : ""}
+          <p><strong>E-posta:</strong> ${html(email)}</p>
+          ${isCareerCompassCompletion
+            ? '<p><strong>Test durumu:</strong> Tamamlandı — henüz görüşme talebi oluşturulmadı.</p>'
+            : `<p><strong>Ofis:</strong> ${html(office)}</p><p><strong>Deneyim:</strong> ${html(experience)}</p><p><strong>Uygun zaman:</strong> ${html(preferredTime)}</p><p><strong>Not:</strong> ${html(note || "—")}</p>`}
+          ${profile ? `<p><strong>${isAdvisorCompass ? "Danışman Pusulası" : "Kariyer Pusulası"}:</strong> ${html(profile)} (${html(PROFILE_NAMES[profile] || profile)}) baskın · ${html(secondaryProfile)} (${html(PROFILE_NAMES[secondaryProfile] || secondaryProfile)}) destekleyici</p><p><strong>Profil dağılımı:</strong> ${html(profileScores)}</p>` : ""}
           <p><strong>Pazarlama izni:</strong> ${body.consent_marketing ? "Evet" : "Hayır"}</p>
           <hr style="border:0;border-top:1px solid #e5e7eb;margin:20px 0" />
           <h2 style="font-size:16px">Reklam kaynağı</h2>
@@ -95,13 +118,16 @@ export async function POST(request: Request) {
     if (!recipients.length) return NextResponse.json({ error: "server_config" }, { status: 500 });
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const result = await resend.emails.send({
-      from: `KWAVO <${process.env.CONTACT_FROM || "iletisim@kwavo.net"}>`,
-      to: recipients,
-      replyTo: email,
-      subject: `Yeni Danışman Adayı: ${name} — ${office}${profile ? ` — Profil ${profile}` : ""}`,
-      html: emailHtml,
-    });
+    const result = await resend.emails.send(
+      {
+        from: `KWAVO <${process.env.CONTACT_FROM || "iletisim@kwavo.net"}>`,
+        to: recipients,
+        replyTo: email,
+        subject,
+        html: emailHtml,
+      },
+      eventId ? { idempotencyKey: `advisor-lead-${eventId}` } : undefined,
+    );
 
     if (result.error) throw new Error(result.error.message);
 
@@ -125,8 +151,7 @@ export async function POST(request: Request) {
 
     // Portal aday panelinden "Danışman Ol" formu ve Kariyer Pusulası görüşme
     // talepleri beslenir; Danışman Pusulası (mevcut danışmanlar için) hariç.
-    const source = clean(body.source, 40);
-    if (source !== "advisor_compass" && process.env.PORTAL_LEAD_URL && process.env.PORTAL_LEAD_SECRET) {
+    if (source !== "advisor_compass" && source !== "career_compass_completed" && process.env.PORTAL_LEAD_URL && process.env.PORTAL_LEAD_SECRET) {
       const sourceForm = source === "career_compass" ? "career_compass_meeting" : "advisor_form";
       const hasProfile = body.profile || body.secondary_profile || body.profile_scores;
       try {
