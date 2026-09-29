@@ -151,6 +151,38 @@ export async function POST(request: Request) {
       }
     }
 
+    // Talep portaldaki "Mülk Sahibi Talepleri" ekranına da düşer. Adres ayrıca
+    // tanımlanmadıysa aday webhook'unun sunucusundan türetilir; anahtar aynıdır.
+    const portalSellerUrl = process.env.PORTAL_SELLER_LEAD_URL
+      || (process.env.PORTAL_LEAD_URL ? new URL("/api/leads/seller", process.env.PORTAL_LEAD_URL).toString() : "");
+    if (portalSellerUrl && process.env.PORTAL_LEAD_SECRET) {
+      try {
+        const portalResponse = await fetch(portalSellerUrl, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-webhook-secret": process.env.PORTAL_LEAD_SECRET,
+          },
+          body: JSON.stringify({
+            name, phone, email, district,
+            property_type: propertyType,
+            sale_time: saleTime,
+            preferred_time: preferredTime,
+            property_intent: intent,
+            consent_terms: true,
+            source_url: clean(body.source_url, 1000),
+            attribution,
+          }),
+        });
+        if (!portalResponse.ok) {
+          // Talep e-postayla zaten iletildi; forma hata döndürmeye gerek yok.
+          console.error("Portal seller lead sync failed:", portalResponse.status);
+        }
+      } catch (portalError) {
+        console.error("Portal seller lead sync error:", portalError);
+      }
+    }
+
     return NextResponse.json({ ok: true, event_id: eventId, lead_reference: leadReference });
   } catch (error) {
     console.error("Seller lead error:", error);
